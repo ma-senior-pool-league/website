@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MatchTable from '../components/MatchTable.astro';
+import { getLeague, isPlayed, nextMatches } from '../lib/league';
+import { formatDate, todayISO } from '../lib/format';
+
+const league = getLeague();
+const season = league.currentSeason;
+const today = todayISO();
+const upNext = nextMatches(season.matches, today);
+---
+
+<BaseLayout title="Schedules" description={`${season.name} division schedules.`}>
+  <h1>{season.name} schedules</h1>
+  <p class="lede">Choose a division to see its full schedule and results.</p>
+
+  <div class="grid">
+    {
+      league.divisions.map((division) => {
+        const matches = season.matches.filter((m) => m.divisionId === division.id);
+        const next = nextMatches(matches, today)[0];
+        const remaining = matches.filter((m) => !isPlayed(m)).length;
+        return (
+          <article class="card">
+            <h2 style="margin-top: 0.25rem;">{division.name}</h2>
+            {matches.length ? (
+              <>
+                <p class="meta">
+                  {matches.length} matches ·{' '}
+                  {next
+                    ? `next on ${formatDate(next.date)}`
+                    : remaining
+                      ? `${remaining} awaiting results`
+                      : 'regular season complete'}
+                </p>
+                <a class="button" href={`/seasons/${season.id}/${division.id}/`}>
+                  Schedule &amp; results
+                </a>
+              </>
+            ) : (
+              <p class="empty">Schedule not posted yet.</p>
+            )}
+          </article>
+        );
+      })
+    }
+  </div>
+
+  {
+    upNext.length > 0 && (
+      <section aria-labelledby="next-heading">
+        <h2 id="next-heading">Next matches: {formatDate(upNext[0]!.date)}</h2>
+        <MatchTable matches={upNext} showDate={false} showDivision />
+      </section>
+    )
+  }
+</BaseLayout>

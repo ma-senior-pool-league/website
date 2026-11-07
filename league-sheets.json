@@ -1,0 +1,16 @@
+{
+  "_help": "Links to each tab of the league Google Sheet, published as CSV (File > Share > Publish to web). Leave a link empty to keep using the copy in src/data/league/. See docs/GOOGLE_SETUP.md.",
+  "tabs": {
+    "settings.csv": "",
+    "seasons.csv": "",
+    "divisions.csv": "",
+    "locations.csv": "",
+    "teams.csv": "",
+    "schedule.csv": "",
+    "results.csv": "",
+    "playoffs.csv": "",
+    "news.csv": "",
+    "documents.csv": "",
+    "contacts.csv": ""
+  }
+}

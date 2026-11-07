@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PlayoffTable from '../components/PlayoffTable.astro';
+import { getLeague } from '../lib/league';
+
+const league = getLeague();
+const season = league.currentSeason;
+
+// Division leaders, for context.
+const leaders = season.divisionIds.map((id) => ({
+  division: league.divisionById.get(id)!,
+  leader: season.standings.get(id)![0]!,
+}));
+---
+
+<BaseLayout title="Playoffs" description={`${season.name} playoff schedule and results.`}>
+  <h1>{season.name} playoffs</h1>
+  <p class="lede">
+    Division winners play a series: the first team to win 2 matches advances. The team with the better
+    regular-season record has home advantage (<a href="/rules/#04-other-regulations">rules</a>, item I).
+  </p>
+
+  {
+    season.playoffs.length ? (
+      <PlayoffTable matches={season.playoffs} />
+    ) : (
+      <p class="empty">Playoff matches will be posted when the regular season ends.</p>
+    )
+  }
+
+  {
+    leaders.length > 0 && (
+      <>
+        <h2>Division {season.status === 'final' ? 'winners' : 'leaders'}</h2>
+        <ul class="card-list card">
+          {leaders.map(({ division, leader }) => (
+            <li>
+              <strong>{division.name}:</strong> <a href={`/teams/${leader.team.id}/`}>{leader.team.name}</a>{' '}
+              <span class="meta">
+                ({leader.wins}–{leader.losses}, {leader.gamesWon} games won)
+              </span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+  <p><a href="/seasons/">Past seasons' playoffs &rarr;</a></p>
+</BaseLayout>

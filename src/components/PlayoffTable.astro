@@ -1,0 +1,64 @@
+---
+import { getLeague, type PlayoffMatch } from '../lib/league';
+import { formatDate, formatTime } from '../lib/format';
+
+interface Props {
+  matches: PlayoffMatch[];
+}
+
+const { matches } = Astro.props;
+const { teamById } = getLeague();
+
+// Group by round, keeping the order rounds first appear in.
+const rounds = new Map<string, PlayoffMatch[]>();
+for (const m of matches) rounds.set(m.round, [...(rounds.get(m.round) ?? []), m]);
+---
+
+{
+  [...rounds.entries()].map(([round, ms]) => (
+    <section aria-label={round} style="margin-bottom: 1.5rem;">
+      {rounds.size > 1 && <h3>{round}</h3>}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Match</th>
+              <th scope="col">Location</th>
+              <th scope="col">Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ms.map((m) => {
+              const t1 = teamById.get(m.team1Id)!;
+              const t2 = teamById.get(m.team2Id)!;
+              const played = m.team1Score !== null && m.team2Score !== null;
+              return (
+                <tr>
+                  <td>
+                    {m.date ? formatDate(m.date) : 'To be announced'}
+                    {m.time && <div class="meta">{formatTime(m.time)}</div>}
+                  </td>
+                  <td class="wrap">
+                    <a href={`/teams/${t1.id}/`} class:list={{ 'score-win': played && m.team1Score! > m.team2Score! }}>
+                      {t1.name}
+                    </a>{' '}
+                    vs{' '}
+                    <a href={`/teams/${t2.id}/`} class:list={{ 'score-win': played && m.team2Score! > m.team1Score! }}>
+                      {t2.name}
+                    </a>
+                    {m.note && <div class="meta">{m.note}</div>}
+                  </td>
+                  <td class="wrap">
+                    {m.locationId ? <a href={`/locations/#${m.locationId}`}>{m.location}</a> : m.location || '—'}
+                  </td>
+                  <td>{played ? `${m.team1Score}–${m.team2Score}` : <span class="pill">Upcoming</span>}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  ))
+}

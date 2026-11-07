@@ -1,0 +1,29 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SeasonStandings from '../../../components/SeasonStandings.astro';
+import PlayoffTable from '../../../components/PlayoffTable.astro';
+import { getLeague, seasonStatusLabel } from '../../../lib/league';
+
+export const getStaticPaths = (() =>
+  getLeague().seasons.map((season) => ({ params: { season: season.id } }))) satisfies GetStaticPaths;
+
+const season = getLeague().seasonById.get(Astro.params.season!)!;
+---
+
+<BaseLayout title={season.name} description={`${season.name} results and standings.`}>
+  <p><a href="/seasons/">&larr; All seasons</a></p>
+  <h1>{season.name} <span class="pill">{seasonStatusLabel[season.status]}</span></h1>
+  <p class="lede">Teams are ranked by matches won, then by total games won.</p>
+
+  <SeasonStandings season={season} />
+
+  {
+    season.playoffs.length > 0 && (
+      <section aria-labelledby="playoffs-heading">
+        <h2 id="playoffs-heading">Playoffs</h2>
+        <PlayoffTable matches={season.playoffs} />
+      </section>
+    )
+  }
+</BaseLayout>

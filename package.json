@@ -1,0 +1,27 @@
+{
+  "name": "ma-senior-pool-league",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Website for the MA Senior Pool League",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node scripts/sync-sheet.mjs --soft && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "sync": "node scripts/sync-sheet.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.4.7",
+    "papaparse": "^5.7.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/node": "^26.6.6",
+    "@types/papaparse": "^5.5.2",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLeague } from '../../lib/league';
+import { formatDate } from '../../lib/format';
+
+const { news } = getLeague();
+---
+
+<BaseLayout title="News" description="League announcements and news.">
+  <h1>News</h1>
+  <p class="lede">Announcements from the league.</p>
+
+  {
+    news.length ? (
+      news.map((item) => (
+        <article class="card prose news-item" id={item.id}>
+          <h2 style="margin-top: 0.25rem;">{item.title}</h2>
+          <p class="meta">{formatDate(item.date)}</p>
+          {item.paragraphs.map((p) => (
+            <p>{p}</p>
+          ))}
+          {item.link && (
+            <p>
+              <a href={item.link}>More details &rarr;</a>
+            </p>
+          )}
+        </article>
+      ))
+    ) : (
+      <p class="empty">No news yet.</p>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .news-item {
+    max-width: 45rem;
+    margin-bottom: 1.25rem;
+  }
+</style>

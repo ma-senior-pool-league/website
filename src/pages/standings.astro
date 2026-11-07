@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SeasonStandings from '../components/SeasonStandings.astro';
+import { getLeague, seasonStatusLabel } from '../lib/league';
+
+const league = getLeague();
+const season = league.currentSeason;
+---
+
+<BaseLayout title="Standings" description={`${season.name} standings for every division.`}>
+  <h1>{season.name} standings <span class="pill">{seasonStatusLabel[season.status]}</span></h1>
+  <p class="lede">
+    Teams are ranked by matches won, then by total games won. Games include tie-breaker games.
+  </p>
+  <SeasonStandings season={season} />
+  <p><a href="/seasons/">Past seasons &rarr;</a></p>
+</BaseLayout>

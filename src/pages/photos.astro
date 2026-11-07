@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLeague } from '../lib/league';
+
+const { settings } = getLeague();
+---
+
+<BaseLayout title="Photos" description="Photos from league matches and events.">
+  <h1>Photos</h1>
+  {
+    settings.photoAlbumUrl ? (
+      <>
+        <p class="lede">Our photos are kept in a shared Google Photos album.</p>
+        <p>
+          <a class="button" href={settings.photoAlbumUrl} rel="noopener noreferrer" target="_blank">
+            Open the photo album
+          </a>
+        </p>
+        <section class="card prose" aria-labelledby="add-heading">
+          <h2 id="add-heading" style="margin-top: 0.25rem;">Adding your photos</h2>
+          <p>
+            Open the album on your phone and tap the button to add photos. You'll need to sign in with a Google
+            account. No Google account? Email your photos to the commissioner and they'll add them.
+          </p>
+          <p>Please ask before posting a photo of someone.</p>
+        </section>
+      </>
+    ) : (
+      <p class="empty">The photo album is coming soon.</p>
+    )
+  }
+</BaseLayout>

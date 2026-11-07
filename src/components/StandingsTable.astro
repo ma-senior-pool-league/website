@@ -1,0 +1,59 @@
+---
+import type { StandingRow } from '../lib/league';
+
+interface Props {
+  caption: string;
+  rows: StandingRow[];
+  /** Compact view for the home page: rank, team, W, L, games won only. */
+  compact?: boolean;
+}
+
+const { caption, rows, compact = false } = Astro.props;
+const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
+---
+
+<div class="table-wrap">
+  <table>
+    <caption>{caption}</caption>
+    <thead>
+      <tr>
+        <th scope="col" class="num">#</th>
+        <th scope="col">Team</th>
+        <th scope="col" class="num"><abbr title="Matches won">W</abbr></th>
+        <th scope="col" class="num"><abbr title="Matches lost">L</abbr></th>
+        <th scope="col" class="num">Games won</th>
+        {
+          !compact && (
+            <>
+              <th scope="col" class="num">Games lost</th>
+              <th scope="col" class="num">Game win %</th>
+            </>
+          )
+        }
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row, i) => (
+          <tr>
+            <td class="num">{i + 1}</td>
+            <th scope="row">
+              <a href={`/teams/${row.team.id}/`}>{row.team.name}</a>
+            </th>
+            <td class="num">
+              <strong>{row.wins}</strong>
+            </td>
+            <td class="num">{row.losses}</td>
+            <td class="num">{row.gamesWon}</td>
+            {!compact && (
+              <>
+                <td class="num">{row.gamesLost}</td>
+                <td class="num">{row.played ? pct(row.gameWinPct) : '—'}</td>
+              </>
+            )}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

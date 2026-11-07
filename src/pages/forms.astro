@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLeague } from '../lib/league';
+
+const { documents, settings } = getLeague();
+const isExternal = (url: string) => /^https?:/i.test(url);
+---
+
+<BaseLayout title="Forms & documents" description="Score sheets, rules and other league documents.">
+  <h1>Forms &amp; documents</h1>
+  <p class="lede">Everything captains and coordinators need to print or send in.</p>
+
+  {
+    settings.scoreSheetFormUrl && (
+      <section class="card" style="margin-bottom: 1.5rem;" aria-labelledby="submit-heading">
+        <h2 id="submit-heading" style="margin-top: 0.25rem;">Send in a completed score sheet</h2>
+        <p>
+          Take a clear photo of the score sheet with your phone, then fill in the short form. You'll be asked
+          to sign in with a Google account.
+        </p>
+        <p>
+          <strong>No Google account?</strong> Send the photo and the score to the commissioner or your
+          division coordinator by email or text, and they'll submit it for you.
+        </p>
+        <a class="button" href={settings.scoreSheetFormUrl} rel="noopener noreferrer" target="_blank">
+          Open the score sheet form
+        </a>
+      </section>
+    )
+  }
+
+  <h2>Print</h2>
+  {
+    documents.length ? (
+      <ul class="card-list card">
+        {documents.map((doc) => (
+          <li>
+            {doc.url ? (
+              <a
+                href={doc.url}
+                {...(isExternal(doc.url) ? { rel: 'noopener noreferrer', target: '_blank' } : {})}
+              >
+                <strong>{doc.title}</strong>
+              </a>
+            ) : (
+              <strong>{doc.title}</strong>
+            )}
+            {doc.status && <span class="pill"> {doc.status}</span>}
+            {doc.description && <div>{doc.description}</div>}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p class="empty">No documents posted yet.</p>
+    )
+  }
+</BaseLayout>

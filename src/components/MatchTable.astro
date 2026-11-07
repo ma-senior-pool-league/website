@@ -1,0 +1,98 @@
+---
+import { getLeague, isPlayed, type Match } from '../lib/league';
+import { formatDate, formatTime } from '../lib/format';
+
+interface Props {
+  matches: Match[];
+  /** Show a date column (hide it when the surrounding heading already gives the date). */
+  showDate?: boolean;
+  /** Show the week number column. */
+  showWeek?: boolean;
+  /** Show the division column (for lists that mix divisions). */
+  showDivision?: boolean;
+  /** Show links to uploaded score sheets (only if enabled in Settings). */
+  showScoreSheets?: boolean;
+  caption?: string;
+}
+
+const { matches, showDate = true, showWeek = false, showDivision = false, showScoreSheets = false, caption } = Astro.props;
+const { teamById, locationById, divisionById, settings } = getLeague();
+const sheets = showScoreSheets && settings.showScoreSheetLinks;
+---
+
+<div class="table-wrap">
+  <table>
+    {caption && <caption>{caption}</caption>}
+    <thead>
+      <tr>
+        {showWeek && <th scope="col" class="num">Wk</th>}
+        {showDate && <th scope="col">Date</th>}
+        {showDivision && <th scope="col">Division</th>}
+        <th scope="col">Time</th>
+        <th scope="col">Away</th>
+        <th scope="col">Home</th>
+        <th scope="col">Location</th>
+        <th scope="col">Result</th>
+        {sheets && <th scope="col">Score sheet</th>}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        matches.map((m) => {
+          const home = teamById.get(m.homeId)!;
+          const away = teamById.get(m.awayId)!;
+          const venue = locationById.get(home.locationId);
+          const played = isPlayed(m);
+          const homeWon = played && m.homeScore! > m.awayScore!;
+          return (
+            <tr>
+              {showWeek && <td class="num">{m.week}</td>}
+              {showDate && <td>{formatDate(m.date)}</td>}
+              {showDivision && <td>{divisionById.get(m.divisionId)?.name}</td>}
+              <td>{formatTime(m.time) || '—'}</td>
+              <td class:list={{ 'score-win': played && !homeWon }}>
+                <a href={`/teams/${away.id}/`}>{away.name}</a>
+              </td>
+              <td class:list={{ 'score-win': homeWon }}>
+                <a href={`/teams/${home.id}/`}>{home.name}</a>
+              </td>
+              <td>{venue ? venue.name : '—'}</td>
+              <td>
+                {played ? (
+                  <span>
+                    <span class="visually-hidden">Final, away to home: </span>
+                    {m.awayScore}–{m.homeScore}
+                  </span>
+                ) : (
+                  <span class="pill">Upcoming</span>
+                )}
+              </td>
+              {sheets && (
+                <td>
+                  {m.scoreSheetUrls.length
+                    ? m.scoreSheetUrls.map((url, i) => (
+                        <a href={url} rel="noopener noreferrer" target="_blank">
+                          {m.scoreSheetUrls.length > 1 ? `Sheet ${i + 1}` : 'View'}{' '}
+                        </a>
+                      ))
+                    : '—'}
+                </td>
+              )}
+            </tr>
+          );
+        })
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>

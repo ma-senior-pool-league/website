@@ -1,0 +1,99 @@
+---
+/**
+ * Plain-language report for the commissioner: when the site last read the
+ * league Google Sheet, and any rows it had to skip. Not linked from the menu.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLeague, readSyncStatus } from '../lib/league';
+import { site } from '../site.config';
+
+const { problems, pendingApproval } = getLeague();
+const sync = readSyncStatus();
+
+/** CSV file name -> the tab name people see in the Google Sheet. */
+const tabName = (file: string) =>
+  file.replace(/\.csv$/, '').replace(/^\w/, (c) => c.toUpperCase());
+
+const byTab = new Map<string, typeof problems>();
+for (const p of problems) byTab.set(tabName(p.file), [...(byTab.get(tabName(p.file)) ?? []), p]);
+
+const builtAt = new Date().toLocaleString('en-US', { timeZone: site.timezone, dateStyle: 'full', timeStyle: 'short' });
+const syncedAt = sync
+  ? new Date(sync.syncedAt).toLocaleString('en-US', { timeZone: site.timezone, dateStyle: 'full', timeStyle: 'short' })
+  : '';
+const syncFailures = sync ? Object.entries(sync.files).filter(([, s]) => s.startsWith('error')) : [];
+---
+
+<BaseLayout title="Data check" description="Status of the league data behind this website.">
+  <meta name="robots" content="noindex" slot="head" />
+  <h1>Data check</h1>
+  <p class="lede">
+    This page shows whether the website could read everything in the league Google Sheet. Bookmark it.
+  </p>
+
+  <ul class="card-list card">
+    <li><strong>Website last updated:</strong> {builtAt}</li>
+    <li>
+      <strong>Google Sheet last read:</strong>
+      {syncedAt || 'Not connected to the Google Sheet yet (using the copy saved with the website).'}
+    </li>
+    {
+      pendingApproval > 0 && (
+        <li>
+          <strong>Waiting for approval:</strong> {pendingApproval} result{pendingApproval === 1 ? '' : 's'} on the
+          Results tab {pendingApproval === 1 ? 'is' : 'are'} not ticked "Approved" yet.
+        </li>
+      )
+    }
+  </ul>
+
+  {
+    syncFailures.length > 0 && (
+      <section aria-labelledby="sync-heading">
+        <h2 id="sync-heading">Tabs that couldn't be read</h2>
+        <p>The website kept using the last good copy of these tabs:</p>
+        <ul class="card-list card">
+          {syncFailures.map(([file, status]) => (
+            <li>
+              <strong>{tabName(file.split('/').pop()!)}:</strong> {status.replace(/^error:\s*/, '')}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <h2>Rows the website skipped</h2>
+  {
+    problems.length ? (
+      <>
+        <p>
+          Fix these in the Google Sheet. The website will pick up the change the next time it updates. Row numbers
+          match the row numbers in the Sheet.
+        </p>
+        {[...byTab.entries()].map(([tab, list]) => (
+          <section aria-label={`${tab} tab`}>
+            <h3>{tab} tab</h3>
+            {tab === 'Results' && (
+              <p class="meta">
+                The Results tab copies the Form Responses 1 tab. Make corrections on Form Responses 1.
+              </p>
+            )}
+            <ul class="card-list card">
+              {list.map((p) => (
+                <li>
+                  {p.row && <strong>Row {p.row}: </strong>}
+                  {p.message}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </>
+    ) : (
+      <p class="card" style="font-weight: 700; color: var(--win);">
+        ✓ Everything in the Google Sheet was read without problems.
+      </p>
+    )
+  }
+</BaseLayout>

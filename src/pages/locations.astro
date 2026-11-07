@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLeague } from '../lib/league';
+
+const league = getLeague();
+
+const mapHref = (v: { mapUrl: string; name: string; address: string; city: string }) =>
+  v.mapUrl ||
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${v.name}, ${v.address}, ${v.city}, MA`)}`;
+---
+
+<BaseLayout title="Locations" description="Where league matches are played, by division.">
+  <h1>Playing locations</h1>
+  <p class="lede">Matches are played at the home team's location. Phone numbers are the center's main line.</p>
+
+  {
+    league.divisions.map((division) => {
+      const divisionTeams = league.teams.filter((t) => t.divisionId === division.id);
+      const venueIds = [...new Set(divisionTeams.map((t) => t.locationId).filter(Boolean))];
+      return (
+        <section aria-labelledby={`loc-${division.id}`}>
+          <h2 id={`loc-${division.id}`}>{division.name}</h2>
+          <div class="grid">
+            {venueIds.map((id) => {
+              const venue = league.locationById.get(id)!;
+              const homeTeams = divisionTeams.filter((t) => t.locationId === id);
+              return (
+                <article class="card" id={venue.id}>
+                  <h3 style="margin-top: 0.25rem;">{venue.name}</h3>
+                  <p class="meta" style="margin: 0 0 0.5rem;">
+                    Home of{' '}
+                    {homeTeams.map((t, i) => (
+                      <>
+                        {i > 0 && (i === homeTeams.length - 1 ? ' and ' : ', ')}
+                        <a href={`/teams/${t.id}/`}>{t.name}</a>
+                      </>
+                    ))}
+                  </p>
+                  <address style="font-style: normal;">
+                    <div>{venue.address}</div>
+                    <div>{venue.city}, MA</div>
+                    {venue.phone && (
+                      <div>
+                        <a href={`tel:${venue.phone.replace(/[^\d+]/g, '')}`}>{venue.phone}</a>
+                      </div>
+                    )}
+                  </address>
+                  <p style="margin-bottom: 0;">
+                    <a href={mapHref(venue)} rel="noopener noreferrer" target="_blank">
+                      Map &amp; directions
+                    </a>
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      );
+    })
+  }
+</BaseLayout>

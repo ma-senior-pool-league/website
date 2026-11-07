@@ -1,0 +1,54 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import StandingsTable from '../../../components/StandingsTable.astro';
+import MatchTable from '../../../components/MatchTable.astro';
+import { byWeek, getLeague, isPlayed, seasonStatusLabel } from '../../../lib/league';
+import { formatDate, formatTime, todayISO } from '../../../lib/format';
+
+export const getStaticPaths = (() =>
+  getLeague().seasons.flatMap((season) =>
+    season.divisionIds.map((division) => ({ params: { season: season.id, division } })),
+  )) satisfies GetStaticPaths;
+
+const league = getLeague();
+const season = league.seasonById.get(Astro.params.season!)!;
+const division = league.divisionById.get(Astro.params.division!)!;
+const matches = season.matches.filter((m) => m.divisionId === division.id);
+const weeks = byWeek(matches);
+const today = todayISO();
+const currentWeek = weeks.find(([, ms]) => ms.some((m) => !isPlayed(m) && m.date >= today))?.[0];
+const times = [...new Set(matches.map((m) => m.time).filter(Boolean))];
+const startTime = times.length === 1 ? formatTime(times[0]!) : '';
+const allThursdays = matches.every((m) => new Date(`${m.date}T00:00:00Z`).getUTCDay() === 4);
+---
+
+<BaseLayout
+  title={`${division.name} · ${season.name}`}
+  description={`${division.name} division schedule, results and standings for ${season.name}.`}
+>
+  <p><a href={`/seasons/${season.id}/`}>&larr; {season.name}: all divisions</a></p>
+  <h1>{division.name} <span class="pill">{season.name} · {seasonStatusLabel[season.status]}</span></h1>
+  <p class="lede">
+    {startTime && `Matches start at ${startTime}${allThursdays ? ', every Thursday,' : ''} `}
+    {startTime ? 'at' : 'Matches are played at'} the home team's location. Scores are games won,
+    away–home, and include any tie-breaker games.
+    {currentWeek && <a href={`#week-${currentWeek}`}>Jump to the next week.</a>}
+  </p>
+
+  <h2>Standings</h2>
+  <StandingsTable caption={`${division.name} — ${season.name}`} rows={season.standings.get(division.id)!} />
+
+  <h2>Schedule &amp; results</h2>
+  {
+    weeks.map(([week, ms]) => (
+      <section id={`week-${week}`} aria-labelledby={`week-${week}-h`}>
+        <h3 id={`week-${week}-h`}>
+          Week {week}: {formatDate(ms[0]!.date)}
+          {week === currentWeek && <span class="pill"> Up next</span>}
+        </h3>
+        <MatchTable matches={ms} showDate={false} showScoreSheets />
+      </section>
+    ))
+  }
+</BaseLayout>

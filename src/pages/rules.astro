@@ -1,0 +1,82 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLeague } from '../lib/league';
+
+const { settings } = getLeague();
+const sections = (await getCollection('rules')).sort((a, b) => a.data.order - b.data.order);
+const rendered = await Promise.all(
+  sections.map(async (entry) => ({ entry, Content: (await render(entry)).Content })),
+);
+
+const otherRules = [
+  { name: 'BCA', href: settings.bcaRulesUrl },
+  { name: 'WPA', href: settings.wpaRulesUrl },
+  { name: 'UPA', href: settings.upaRulesUrl },
+];
+const ext = { rel: 'noopener noreferrer', target: '_blank' };
+---
+
+<BaseLayout title="Rules" description="MA Senior Pool League 8-ball rules and regulations.">
+  <h1>League rules</h1>
+
+  {
+    settings.rulesUrl ? (
+      <>
+        <p class="lede">The current league rules are in this document.</p>
+        <p>
+          <a class="button" href={settings.rulesUrl} {...ext}>
+            Read the league rules
+          </a>
+        </p>
+      </>
+    ) : (
+      <>
+        <p class="lede">Mass Senior 8-ball League Rules, updated July 2024.</p>
+        <p>
+          <a class="button" href="/documents/league-rules-july-2024.pdf">
+            Printable rules (PDF)
+          </a>
+        </p>
+        <ul class="toc" aria-label="Rules sections">
+          {sections.map((s) => (
+            <li>
+              <a href={`#${s.id}`}>{s.data.title}</a>
+            </li>
+          ))}
+          <li>
+            <a href="#other-rule-books">Other rule books</a>
+          </li>
+        </ul>
+        <div class="prose">
+          {rendered.map(({ entry, Content }) => (
+            <section id={entry.id}>
+              <h2>{entry.data.title}</h2>
+              <Content />
+            </section>
+          ))}
+        </div>
+      </>
+    )
+  }
+
+  <section id="other-rule-books" class="prose">
+    <h2>Other rule books</h2>
+    <p>For situations the league rules don't cover:</p>
+    <ul>
+      {
+        otherRules.map((r) => (
+          <li>
+            {r.href ? (
+              <a href={r.href} {...ext}>
+                {r.name} rules
+              </a>
+            ) : (
+              <>{r.name} rules (link coming soon)</>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

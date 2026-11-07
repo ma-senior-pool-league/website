@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLeague } from '../../lib/league';
+
+const league = getLeague();
+---
+
+<BaseLayout title="Teams" description="All teams in the league, by division.">
+  <h1>Teams</h1>
+  <p class="lede">{league.teams.length} teams in {league.divisions.length} divisions, with their home locations.</p>
+
+  {
+    league.divisions.map((division) => (
+      <section aria-labelledby={`div-${division.id}`}>
+        <h2 id={`div-${division.id}`}>{division.name}</h2>
+        <ul class="card-list card" style="padding-block: 0.25rem;">
+          {league.teams
+            .filter((t) => t.divisionId === division.id)
+            .map((team) => {
+              const venue = league.locationById.get(team.locationId);
+              return (
+                <li>
+                  <a href={`/teams/${team.id}/`}>
+                    <strong>{team.name}</strong>
+                  </a>
+                  {venue && <span class="meta"> · {venue.name}</span>}
+                </li>
+              );
+            })}
+        </ul>
+      </section>
+    ))
+  }
+</BaseLayout>

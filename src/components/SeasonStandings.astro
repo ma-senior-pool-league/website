@@ -1,0 +1,49 @@
+---
+import StandingsTable from './StandingsTable.astro';
+import { getLeague, type Season } from '../lib/league';
+
+interface Props {
+  season: Season;
+  compact?: boolean;
+  /** Heading level for division headings. */
+  level?: 'h2' | 'h3';
+}
+
+const { season, compact = false, level = 'h2' } = Astro.props;
+const { divisions } = getLeague();
+const Heading = level;
+const posted = divisions.filter((d) => season.divisionIds.includes(d.id));
+const notPosted = divisions.filter((d) => !season.divisionIds.includes(d.id));
+---
+
+<div class:list={[compact && 'grid']}>
+  {
+    posted.map((division) => (
+      <section aria-labelledby={`st-${season.id}-${division.id}`} class="division-block">
+        <Heading id={`st-${season.id}-${division.id}`}>{division.name}</Heading>
+        <StandingsTable
+          caption={`${division.name} — ${season.name}`}
+          rows={season.standings.get(division.id)!}
+          compact={compact}
+        />
+        <a class="more" href={`/seasons/${season.id}/${division.id}/`}>
+          {division.name} schedule &amp; results &rarr;
+        </a>
+      </section>
+    ))
+  }
+</div>
+
+{
+  notPosted.length > 0 && (
+    <p class="meta">
+      Not posted yet for {season.name}: {notPosted.map((d) => d.name).join(', ')}.
+    </p>
+  )
+}
+
+<style>
+  .division-block {
+    margin-bottom: 1.5rem;
+  }
+</style>

@@ -1,0 +1,77 @@
+---
+import '../styles/global.css';
+import { site } from '../site.config';
+import { getLeague } from '../lib/league';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.tagline } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : site.name;
+const pathname = Astro.url.pathname;
+const isCurrent = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
+const league = getLeague();
+const seasonName = league.currentSeason.name;
+const { settings } = league;
+const nav = site.nav.filter((item) => !item.requires || settings[item.requires]);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+
+    {
+      settings.notice && (
+        <div class="sample-banner" role="note">
+          {settings.notice}
+        </div>
+      )
+    }
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/">
+          <span class="brand-ball" aria-hidden="true">8</span>
+          <span class="brand-text">
+            <span class="brand-name">{site.name}</span>
+            <span class="brand-season">{seasonName} season</span>
+          </span>
+        </a>
+        <nav aria-label="Main">
+          <ul class="nav-list">
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="container">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© {new Date().getFullYear()} {site.name}</p>
+        {settings.contactEmail && <p><a href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a></p>}
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLeague } from '../lib/league';
+import { site } from '../site.config';
+
+const { contacts, settings, divisionById } = getLeague();
+const tel = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
+---
+
+<BaseLayout title="Contact" description="Contact the league or find out how to join.">
+  <h1>Contact</h1>
+  <p class="lede">
+    The {site.name} is an independent organization and is not affiliated with any other group.
+  </p>
+
+  <div class="grid">
+    <section class="card">
+      <h2>League contacts</h2>
+      {
+        contacts.length ? (
+          <ul class="card-list">
+            {contacts.map((c) => (
+              <li>
+                <strong>{c.name}</strong>
+                <div class="meta">
+                  {c.role}
+                  {c.divisionId && `, ${divisionById.get(c.divisionId)!.name}`}
+                </div>
+                {c.email && (
+                  <div>
+                    <a href={`mailto:${c.email}`}>{c.email}</a>
+                  </div>
+                )}
+                {c.phone && (
+                  <div>
+                    <a href={tel(c.phone)}>{c.phone}</a>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p class="empty">Contact details for the league and the division coordinators will be posted here.</p>
+        )
+      }
+      {
+        settings.contactEmail && (
+          <p>
+            General questions: <a href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a>
+          </p>
+        )
+      }
+    </section>
+
+    <section class="card">
+      <h2>Playing in the league</h2>
+      <p>
+        Players must be at least 60 years old at the start of the season. See the
+        <a href="/rules/#01-age">age requirements</a> for details.
+      </p>
+      <p>Teams play at senior centers and councils on aging. See the <a href="/locations/">playing locations</a>.</p>
+    </section>
+  </div>
+</BaseLayout>

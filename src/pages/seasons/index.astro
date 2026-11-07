@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getLeague, seasonStatusLabel } from '../../lib/league';
+import { formatDate } from '../../lib/format';
+
+const league = getLeague();
+---
+
+<BaseLayout title="Seasons" description="Results and standings for every season.">
+  <h1>Seasons</h1>
+  <p class="lede">Results and standings for every season, by division.</p>
+
+  <div class="grid">
+    {
+      league.seasons.map((season) => (
+        <article class="card">
+          <h2 style="margin-top: 0.25rem;">
+            <a href={`/seasons/${season.id}/`}>{season.name}</a>{' '}
+            <span class="pill">{seasonStatusLabel[season.status]}</span>
+          </h2>
+          {season.startDate && (
+            <p class="meta">
+              {formatDate(season.startDate)}
+              {season.endDate && ` to ${formatDate(season.endDate)}`}
+            </p>
+          )}
+          <ul class="card-list">
+            {season.divisionIds.map((id) => (
+              <li>
+                <a href={`/seasons/${season.id}/${id}/`}>{league.divisionById.get(id)!.name}</a>
+              </li>
+            ))}
+          </ul>
+          {!season.divisionIds.length && <p class="empty">No schedules posted.</p>}
+        </article>
+      ))
+    }
+  </div>
+</BaseLayout>

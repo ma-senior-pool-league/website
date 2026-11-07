@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SeasonStandings from '../components/SeasonStandings.astro';
+import MatchTable from '../components/MatchTable.astro';
+import { getLeague, nextMatches, seasonStatusLabel } from '../lib/league';
+import { formatDate, todayISO } from '../lib/format';
+import { site } from '../site.config';
+
+const league = getLeague();
+const season = league.currentSeason;
+const { settings } = league;
+const upNext = nextMatches(season.matches, todayISO());
+const news = league.news.slice(0, 3);
+---
+
+<BaseLayout>
+  <section class="hero">
+    <h1>{site.name}</h1>
+    <p>{site.tagline}</p>
+    <div class="button-row">
+      <a class="button" href="/standings/">Standings</a>
+      <a class="button secondary" href="/schedule/">Schedules</a>
+    </div>
+  </section>
+
+  <section aria-labelledby="captains-heading">
+    <h2 id="captains-heading">For captains &amp; coordinators</h2>
+    <ul class="quick-links">
+      {
+        settings.scoreSheetFormUrl && (
+          <li>
+            <a href={settings.scoreSheetFormUrl} rel="noopener noreferrer" target="_blank">
+              Submit a completed score sheet
+            </a>
+          </li>
+        )
+      }
+      <li><a href="/forms/">Blank score sheet &amp; forms</a></li>
+      <li><a href="/rules/">League rules</a></li>
+      <li><a href="/locations/">Playing locations</a></li>
+      <li><a href="/schedule/">Division schedules</a></li>
+      <li><a href="/playoffs/">Playoffs</a></li>
+    </ul>
+  </section>
+
+  {
+    upNext.length > 0 && (
+      <section aria-labelledby="next-heading">
+        <h2 id="next-heading">Next matches: {formatDate(upNext[0]!.date)}</h2>
+        <MatchTable matches={upNext} showDate={false} showDivision />
+      </section>
+    )
+  }
+
+  <section aria-labelledby="standings-heading">
+    <h2 id="standings-heading">
+      {season.name} standings <span class="pill">{seasonStatusLabel[season.status]}</span>
+    </h2>
+    <SeasonStandings season={season} compact level="h3" />
+    <a class="more" href="/standings/">Full standings &rarr;</a>
+  </section>
+
+  <section class="card" aria-labelledby="news-heading" style="margin-top: 2rem;">
+    <h2 id="news-heading">Latest news</h2>
+    {
+      news.length ? (
+        <ul class="card-list">
+          {news.map((item) => (
+            <li>
+              <a href={`/news/#${item.id}`}>
+                <strong>{item.title}</strong>
+              </a>
+              <div class="meta">{formatDate(item.date)}</div>
+              {item.paragraphs[0] && <div>{item.paragraphs[0]}</div>}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="empty">No news yet.</p>
+      )
+    }
+    <a class="more" href="/news/">All news &rarr;</a>
+  </section>
+</BaseLayout>

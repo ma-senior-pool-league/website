@@ -29,6 +29,14 @@ const notPosted = divisions.filter((d) => !season.divisionIds.includes(d.id));
         <a class="more" href={`/seasons/${season.id}/${division.id}/`}>
           {division.name} schedule &amp; results &rarr;
         </a>
+        {season.playerStats.has(division.id) && (
+          <>
+            {' · '}
+            <a class="more" href={`/seasons/${season.id}/${division.id}/players/`}>
+              Player stats &rarr;
+            </a>
+          </>
+        )}
       </section>
     ))
   }

@@ -1,0 +1,39 @@
+---
+/**
+ * Public instructions for a volunteer's AI agent that reads score-sheet photos into the
+ * Games tab. Source: docs/SCORE_SHEET_AGENT.md (also served as plain text at
+ * /score-sheet-agent.md). Not in the menu; linked from the Data check page and the
+ * "New score sheet to read" emails.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Content } from '../../docs/SCORE_SHEET_AGENT.md';
+---
+
+<BaseLayout title="Score-sheet agent instructions" description="How a volunteer's AI agent reads score sheets into the league's data.">
+  <meta name="robots" content="noindex" slot="head" />
+  <p class="meta">
+    Plain-text version for AI agents: <a href="/score-sheet-agent.md">/score-sheet-agent.md</a>
+  </p>
+  <div class="prose agent-doc">
+    <Content />
+  </div>
+</BaseLayout>
+
+<style>
+  .agent-doc :global(pre) {
+    overflow-x: auto;
+    background: #f3f1e8;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+  }
+  .agent-doc :global(table) {
+    margin-bottom: 1rem;
+    background: var(--paper);
+  }
+  .agent-doc :global(td),
+  .agent-doc :global(th) {
+    white-space: normal;
+  }
+</style>

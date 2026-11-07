@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import MatchTable from '../../components/MatchTable.astro';
-import { getLeague } from '../../lib/league';
+import { getLeague, playerName } from '../../lib/league';
 
 export const getStaticPaths = (() =>
   getLeague().teams.map((team) => ({ params: { id: team.id } }))) satisfies GetStaticPaths;
@@ -11,6 +11,15 @@ const league = getLeague();
 const team = league.teamById.get(Astro.params.id!)!;
 const division = league.divisionById.get(team.divisionId)!;
 const venue = league.locationById.get(team.locationId);
+
+// Roster with this season's individual records (players who played without being on the roster are included).
+const season = league.currentSeason;
+const statRows = (season.playerStats.get(team.divisionId) ?? []).filter((r) => r.player.teamId === team.id);
+const rosterPlayers = league.players.filter((p) => p.teamId === team.id && !p.provisional);
+const roster = [
+  ...rosterPlayers.map((p) => ({ player: p, stats: statRows.find((r) => r.player.id === p.id) })),
+  ...statRows.filter((r) => r.player.provisional).map((r) => ({ player: r.player, stats: r })),
+].sort((a, b) => (b.stats?.games ?? 0) - (a.stats?.games ?? 0) || a.player.name.localeCompare(b.player.name));
 
 // Every season this team has a schedule in, newest first.
 const history = league.seasons
@@ -41,6 +50,44 @@ const history = league.seasons
         {team.note && <p class="meta" style="margin: 0.25rem 0 0;">{team.note}</p>}
         <a class="more" href={`/locations/#${venue.id}`}>Map &amp; all locations &rarr;</a>
       </div>
+    )
+  }
+
+  {
+    roster.length > 0 && (
+      <section aria-labelledby="roster-heading">
+        <h2 id="roster-heading">Players</h2>
+        <div class="table-wrap">
+          <table>
+            <caption>{team.name} players, {season.name} record</caption>
+            <thead>
+              <tr>
+                <th scope="col">Player</th>
+                <th scope="col" class="num">W</th>
+                <th scope="col" class="num">L</th>
+                <th scope="col" class="num">Win %</th>
+                <th scope="col" class="num">Games</th>
+              </tr>
+            </thead>
+            <tbody>
+              {roster.map(({ player, stats }) => (
+                <tr>
+                  <th scope="row">{playerName(player, league.settings)}</th>
+                  <td class="num">{stats ? stats.wins : ''}</td>
+                  <td class="num">{stats ? stats.losses : ''}</td>
+                  <td class="num">{stats ? `${(stats.winPct * 100).toFixed(1)}%` : ''}</td>
+                  <td class="num">{stats ? stats.games : ''}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {statRows.length > 0 && (
+          <a class="more" href={`/seasons/${season.id}/${team.divisionId}/players/`}>
+            All {league.divisionById.get(team.divisionId)!.name} player stats &rarr;
+          </a>
+        )}
+      </section>
     )
   }
 

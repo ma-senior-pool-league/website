@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getLeague, playerName } from '../lib/league';
+
+const league = getLeague();
+const season = league.currentSeason;
+const { settings } = league;
+---
+
+<BaseLayout title="Player stats" description={`${season.name} player standings by division.`}>
+  <h1>{season.name} player stats</h1>
+  <p class="lede">Individual wins and losses from every score sheet, by division.</p>
+
+  <div class="grid">
+    {
+      league.divisions.map((division) => {
+        const rows = season.playerStats.get(division.id) ?? [];
+        const top = rows.filter((r) => r.games >= settings.playerMinGames).slice(0, 3);
+        return (
+          <article class="card">
+            <h2 style="margin-top: 0.25rem;">{division.name}</h2>
+            {rows.length ? (
+              <>
+                {top.length > 0 && (
+                  <ol class="meta">
+                    {top.map((r) => (
+                      <li>
+                        {playerName(r.player, settings)}, {(r.winPct * 100).toFixed(1)}%
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                <a class="button" href={`/seasons/${season.id}/${division.id}/players/`}>
+                  Player stats
+                </a>
+              </>
+            ) : (
+              <p class="empty">No game-by-game results yet.</p>
+            )}
+          </article>
+        );
+      })
+    }
+  </div>
+  <p><a href="/seasons/">Past seasons &rarr;</a></p>
+</BaseLayout>

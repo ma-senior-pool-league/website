@@ -1,0 +1,29 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import PlayerStats from '../../../../components/PlayerStats.astro';
+import { getLeague, seasonStatusLabel } from '../../../../lib/league';
+
+export const getStaticPaths = (() =>
+  getLeague().seasons.flatMap((season) =>
+    season.divisionIds.map((division) => ({ params: { season: season.id, division } })),
+  )) satisfies GetStaticPaths;
+
+const league = getLeague();
+const season = league.seasonById.get(Astro.params.season!)!;
+const division = league.divisionById.get(Astro.params.division!)!;
+---
+
+<BaseLayout
+  title={`${division.name} player stats · ${season.name}`}
+  description={`${division.name} player standings for ${season.name}.`}
+>
+  <p><a href={`/seasons/${season.id}/${division.id}/`}>&larr; {division.name}: schedule &amp; results</a></p>
+  <h1>
+    {division.name} player stats <span class="pill">{season.name} · {seasonStatusLabel[season.status]}</span>
+  </h1>
+  <p class="lede">
+    Every game played, from the score sheets. Players are ranked by win percentage, then by total wins.
+  </p>
+  <PlayerStats season={season} divisionId={division.id} />
+</BaseLayout>

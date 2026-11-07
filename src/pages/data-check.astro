@@ -4,10 +4,14 @@
  * league Google Sheet, and any rows it had to skip. Not linked from the menu.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getLeague, readSyncStatus } from '../lib/league';
+import { getLeague, isPlayed, readSyncStatus } from '../lib/league';
+import { formatDate } from '../lib/format';
 import { site } from '../site.config';
 
-const { problems, pendingApproval } = getLeague();
+const { problems, pendingApproval, currentSeason, teamById, divisionById } = getLeague();
+
+// Played matches whose score sheet hasn't been read into the Games tab yet.
+const waiting = currentSeason.matches.filter((m) => isPlayed(m) && m.games.length === 0);
 const sync = readSyncStatus();
 
 /** CSV file name -> the tab name people see in the Google Sheet. */
@@ -60,6 +64,55 @@ const syncFailures = sync ? Object.entries(sync.files).filter(([, s]) => s.start
           ))}
         </ul>
       </section>
+    )
+  }
+
+  <h2>Score sheets waiting to be read</h2>
+  {
+    waiting.length ? (
+      <>
+        <p>
+          {waiting.length} {currentSeason.name} match{waiting.length === 1 ? ' has' : 'es have'} a result but no
+          game-by-game rows yet, so player stats don't include them. Whoever reads score sheets (or their AI agent)
+          can work from this list; see the <a href="/score-sheet-agent/">score-sheet agent instructions</a>.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <caption>Waiting to be read</caption>
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Division</th>
+                <th scope="col">Match</th>
+                <th scope="col">Score sheet</th>
+              </tr>
+            </thead>
+            <tbody>
+              {waiting.map((m) => (
+                <tr>
+                  <td>{formatDate(m.date)}</td>
+                  <td>{divisionById.get(m.divisionId)?.name}</td>
+                  <td class="wrap">
+                    Week {m.week}: {teamById.get(m.awayId)!.name} at {teamById.get(m.homeId)!.name},{' '}
+                    {m.awayScore}–{m.homeScore}
+                  </td>
+                  <td>
+                    {m.scoreSheetUrls.length
+                      ? m.scoreSheetUrls.map((url, i) => (
+                          <a href={url} rel="noopener noreferrer" target="_blank">
+                            Photo{m.scoreSheetUrls.length > 1 ? ` ${i + 1}` : ''}{' '}
+                          </a>
+                        ))
+                      : 'No photo sent'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </>
+    ) : (
+      <p class="card">Every {currentSeason.name} match with a result has been read.</p>
     )
   }
 

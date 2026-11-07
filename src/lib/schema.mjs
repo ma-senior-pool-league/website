@@ -48,6 +48,24 @@ export const TABLES = {
       completed_score_sheet: 'score_sheet',
     },
   },
+  'players.csv': {
+    required: ['team', 'name'],
+    optional: ['also_known_as'],
+    optionalFile: true,
+    aliases: { aka: 'also_known_as', nickname: 'also_known_as', nicknames: 'also_known_as', player: 'name' },
+  },
+  'games.csv': {
+    required: ['season', 'home_team', 'away_team', 'away_player', 'home_player', 'winner'],
+    optional: ['week', 'round', 'check', 'sheet', 'read_by'],
+    optionalFile: true,
+    aliases: {
+      home: 'home_team',
+      away: 'away_team',
+      visiting_team: 'away_team',
+      visitor_player: 'away_player',
+      visiting_player: 'away_player',
+    },
+  },
   'playoffs.csv': {
     required: ['season', 'team_1', 'team_2'],
     optional: ['round', 'date', 'time', 'location', 'team_1_score', 'team_2_score', 'note'],

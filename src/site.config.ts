@@ -13,6 +13,7 @@ export const site = {
   /** `requires` hides an item until that Settings value is filled in. */
   nav: [
     { href: '/standings/', label: 'Standings' },
+    { href: '/players/', label: 'Players' },
     { href: '/schedule/', label: 'Schedules' },
     { href: '/playoffs/', label: 'Playoffs' },
     { href: '/locations/', label: 'Locations' },

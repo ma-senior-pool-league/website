@@ -1,0 +1,134 @@
+---
+/**
+ * Player standings for one division in one season: a leaders table (players with
+ * enough games) and a week-by-week table for everyone, like the commissioner's
+ * end-of-season stats sheet.
+ */
+import { getLeague, playerName, type Season } from '../lib/league';
+
+interface Props {
+  season: Season;
+  divisionId: string;
+}
+
+const { season, divisionId } = Astro.props;
+const { settings, teamById, divisionById } = getLeague();
+const division = divisionById.get(divisionId)!;
+const rows = season.playerStats.get(divisionId) ?? [];
+const coverage = season.gameCoverage.get(divisionId);
+const weeks = [...new Set(season.matches.filter((m) => m.divisionId === divisionId).map((m) => m.week))].sort(
+  (a, b) => a - b,
+);
+const min = settings.playerMinGames;
+const leaders = rows.filter((r) => r.games >= min);
+const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
+const name = (r: (typeof rows)[number]) => playerName(r.player, settings);
+const team = (r: (typeof rows)[number]) => teamById.get(r.player.teamId)?.name ?? '';
+---
+
+{
+  coverage && coverage.withGames < coverage.played && (
+    <p class="meta">
+      Game-by-game results are in for {coverage.withGames} of {coverage.played} played matches so far.
+    </p>
+  )
+}
+
+{
+  rows.length === 0 ? (
+    <p class="empty">No game-by-game results for {division.name} yet.</p>
+  ) : (
+    <>
+      <h2>Leaders</h2>
+      {leaders.length ? (
+        <div class="table-wrap">
+          <table>
+            <caption>
+              {division.name} players with at least {min} games
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" class="num">#</th>
+                <th scope="col">Player</th>
+                <th scope="col">Team</th>
+                <th scope="col" class="num">W</th>
+                <th scope="col" class="num">L</th>
+                <th scope="col" class="num">Win %</th>
+                <th scope="col" class="num">Games</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leaders.map((r, i) => (
+                <tr>
+                  <td class="num">{i + 1}</td>
+                  <th scope="row">{name(r)}</th>
+                  <td>
+                    <a href={`/teams/${r.player.teamId}/`}>{team(r)}</a>
+                  </td>
+                  <td class="num">
+                    <strong>{r.wins}</strong>
+                  </td>
+                  <td class="num">{r.losses}</td>
+                  <td class="num">{pct(r.winPct)}</td>
+                  <td class="num">{r.games}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p class="empty">No one has played {min} games yet. Everyone is listed below.</p>
+      )}
+
+      <h2>All players, week by week</h2>
+      <p class="meta">Each week shows wins–losses.</p>
+      <div class="table-wrap">
+        <table class="weekly">
+          <caption>
+            {division.name} players, {season.name}
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Player</th>
+              <th scope="col">Team</th>
+              {weeks.map((w) => (
+                <th scope="col" class="num">
+                  Wk {w}
+                </th>
+              ))}
+              <th scope="col" class="num">W</th>
+              <th scope="col" class="num">L</th>
+              <th scope="col" class="num">Win %</th>
+              <th scope="col" class="num">Games</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr>
+                <th scope="row">{name(r)}</th>
+                <td>{team(r)}</td>
+                {weeks.map((w) => {
+                  const wk = r.weeks.get(w);
+                  return <td class="num">{wk ? `${wk.wins}–${wk.losses}` : ''}</td>;
+                })}
+                <td class="num">
+                  <strong>{r.wins}</strong>
+                </td>
+                <td class="num">{r.losses}</td>
+                <td class="num">{pct(r.winPct)}</td>
+                <td class="num">{r.games}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )
+}
+
+<style>
+  .weekly td.num,
+  .weekly th.num {
+    padding-inline: 0.5rem;
+  }
+</style>

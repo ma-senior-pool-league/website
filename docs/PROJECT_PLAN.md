@@ -32,7 +32,9 @@ Google** (Sheets, Forms, Drive, Photos) without touching code.
 Chosen over a custom Cloudflare backend because no long-term technical maintainer is expected. See
 [GOOGLE_SETUP.md](GOOGLE_SETUP.md) for the full setup.
 
-- **The website** stays a static Astro site on a free host (Netlify or Cloudflare Pages). It
+- **The website** stays a static Astro site on a free host (Netlify or Cloudflare Pages), at the
+  host's free address (e.g. `ma-senior-pool-league.netlify.app`). There's no custom domain, so
+  nothing to renew. It
   rebuilds itself from the league Google Sheet: after each score-sheet submission, daily, and on
   demand from a menu in the Sheet. A small Apps Script does the triggering.
 - **League Data Google Sheet** (owned by a dedicated league Google account): one tab each for
@@ -44,6 +46,16 @@ Chosen over a custom Cloudflare backend because no long-term technical maintaine
 - **"Logins":** Google accounts. Who can see completed score sheets is controlled by Drive sharing.
   Who can edit league data is controlled by Sheet sharing.
 - **Photos:** a shared Google Photos album linked from the site.
+- **Player stats (added at Michael's request):** each score-sheet photo is read into a Games tab,
+  one row per game. The website computes player standings from it, replacing the end-of-season
+  stats sheet the commissioner builds by hand. **The league pays for nothing:** a volunteer's own
+  AI agent does the reading. Michael starts, and any later volunteer can use their own agent. The
+  Apps Script emails the reader (`reader_email`) for each submission, and the agent follows
+  public instructions at `/score-sheet-agent/` (`docs/SCORE_SHEET_AGENT.md`). The website checks
+  every match (4 games per round, one winner each, totals equal to the captain's score) and lists
+  problems and unread sheets on `/data-check/`. A fully automatic reader using Anthropic's API
+  (`google/score-sheet-reader.gs`, about $15–25 a season) is built but off; it can be turned on
+  if the league ever has a way to pay for it.
 - **Safety net:** the site never breaks on bad data. Bad rows are skipped and listed in plain
   language on a `/data-check/` page; unreadable tabs keep their last good copy.
 
@@ -64,7 +76,8 @@ the site updates about 10–15 minutes after a change, not instantly.
 | 7 | Results and standings, by season and division | ✅ Season archive → division pages; live from the Results tab | Other divisions' results |
 | 8 | Photo gallery | 🟡 Photos page links a shared album | Create the album (setup step 5) |
 | 9 | Playoff schedules and results | ✅ Playoffs tab → Playoffs page and season pages | Playoff format and dates |
-| – | Log-in access for specific users | 🟡 Google accounts + sharing | Setup step 9 |
+| – | Log-in access for specific users | 🟡 Google accounts + sharing | Setup step 10 |
+| – | Player standings and stats (Michael, Nov 2026) | 🟡 Built: Players and Games tabs, player pages, agent instructions, reader emails, waiting list on Data check. Week 9 Lexington–Bedford matches the commissioner's sheet for all 8 players | Rosters for all divisions; Michael's agent set up (setup step 8A) |
 
 ## Data issues found in the documents (to confirm with Richard)
 
@@ -100,9 +113,18 @@ the site updates about 10–15 minutes after a change, not instantly.
 9. **Photos:** who may add photos, and do we need players' consent to post them?
 10. **Contacts to publish:** how you'd like to be listed, and the four Division Coordinators' names
     and emails. What's OK to be public?
-11. **Domain and accounts:** do you have a preferred web address? We'll create a league Google
-    account to own everything. Who besides you should have its password?
+11. **Web address and accounts:** the site will use the host's free address (e.g.
+    ma-senior-pool-league.netlify.app), so there's nothing to renew. Any preferred name? We'll create a
+    league Google account to own everything. Who besides you should have its password?
 12. **Past seasons:** do you have earlier results and standings you'd like archived on the site?
+13. **Rosters:** could you send each team's roster for all four divisions (the one you use for the
+    player stats)?
+14. **Player stats spreadsheet:** could you send the Fall 2026 player stats spreadsheet (the Excel
+    file behind the PDF)? It would let the site show this season's full player history.
+15. **Player names online:** OK to show players as "first name + last initial" (e.g. Michael R.)
+    on the public site, or full names as in your emails?
+16. **Substitutes:** when a player subs for another team, which team should their games count
+    under?
 
 ## Roadmap
 
@@ -110,7 +132,7 @@ the site updates about 10–15 minutes after a change, not instantly.
   playoffs, news, contacts; all routine content driven from Sheet-shaped data.
 - **Phase 2: Google setup (next).** League account, League Data sheet, score-sheet form, photo
   album, hosting with automatic rebuilds. Follow [GOOGLE_SETUP.md](GOOGLE_SETUP.md).
-- **Phase 3: Go live.** Other divisions' data, answers to the questions above, domain, clear the
+- **Phase 3: Go live.** Other divisions' data, answers to the questions above, clear the
   preview banner, walk Richard through [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md), first live
   week with real submissions.
 - **Later / optional:** sort uploaded score sheets into season/division Drive folders automatically
@@ -118,11 +140,14 @@ the site updates about 10–15 minutes after a change, not instantly.
 
 ## Risks and notes
 
+- Player stats depend on a volunteer running their own AI agent. If nobody does for a while, the
+  site keeps working: team standings still update, Data check lists the unread sheets, and stats
+  catch up when someone reads them. The optional paid reader's live API call hasn't been tested.
 - Published tabs are readable by anyone with the link. Never publish "Form Responses 1" (it has
   emails). Only put public-OK details on Contacts.
 - Google can take up to 5 minutes to refresh a published tab, so updates appear about 10–15 minutes
   after a change.
-- Keep every account (Google, GitHub, host, domain) in the league's name, with at least two people
+- Keep every account (Google, GitHub, host) in the league's name, with at least two people
   able to get in, so the site survives volunteer turnover.
 - Accessibility for older users stays a hard requirement: large text, high contrast, big buttons,
   simple navigation.

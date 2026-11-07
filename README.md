@@ -6,14 +6,17 @@ score-sheet submission, photos and news. The main audience is the four Division 
 the team captains.
 
 **How it works:** a static [Astro](https://astro.build) site that rebuilds itself from the league's
-Google Sheet. Score sheets come in through a Google Form. The league runs everything from Google,
-with no code edits for routine updates.
+Google Sheet. Score sheets come in through a Google Form. A volunteer's own AI agent reads each
+photo into a Games tab, which drives the player stats; the instructions are at `/score-sheet-agent/`.
+The league runs everything from Google, with no code edits for routine updates and nothing to pay
+for.
 
 | Doc | For |
 | --- | --- |
 | [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) | Requirements, decisions, data issues, questions for Richard |
 | [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md) | One-time setup: league Google account, Sheet, Form, hosting, automatic updates |
 | [docs/COMMISSIONER_GUIDE.md](docs/COMMISSIONER_GUIDE.md) | Plain-language guide for the commissioner |
+| [docs/SCORE_SHEET_AGENT.md](docs/SCORE_SHEET_AGENT.md) | Instructions for a volunteer's AI agent that reads score sheets (published at `/score-sheet-agent/`) |
 | [src/data/league/README.md](src/data/league/README.md) | Every tab and column |
 
 > **Status:** preview. Real locations, teams, rules and the Greater Boston Fall 2026 schedule and
@@ -72,9 +75,10 @@ src/
   lib/format.ts       date/time display helpers
   data/league/        one CSV per Sheet tab
   content/rules/      league rules (Markdown)
-  components/         StandingsTable, SeasonStandings, MatchTable, PlayoffTable
+  components/         StandingsTable, SeasonStandings, MatchTable, PlayoffTable, PlayerStats
   pages/              one file per page; seasons/[season]/[division] for division pages
   styles/global.css   all styling
 scripts/sync-sheet.mjs
-google/apps-script.gs
+google/apps-script.gs           rebuilds, change watcher, reader emails, "Update website now" menu
+google/score-sheet-reader.gs    optional paid automatic reader (Claude API); off by default
 ```

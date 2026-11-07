@@ -10,10 +10,13 @@ day-to-day instructions are in [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md).
 Captain's phone ──► Google Form (score sheet photo + score)
                         │  photo ──► league Google Drive (Form "File responses" folder)
                         ▼
-              League Google Sheet  ◄── Richard edits schedules, teams, news, playoffs, settings
+              League Google Sheet  ◄── Richard edits schedules, teams, rosters, news, playoffs, settings
               (one tab per kind of data; tabs published as CSV)
                         │
-   Apps Script in the Sheet asks the host to rebuild (after each form submit, daily, or on demand)
+   Apps Script emails the reader ──► a volunteer's own AI agent reads the photo ──► Games tab
+                                     (one row per game; the optional paid reader can do this instead)
+   Apps Script asks the host to rebuild (after a form submit, within ~20 min of any tab change,
+   daily, or on demand)
                         ▼
    Web host (Netlify or Cloudflare Pages) runs `npm run build`
      = scripts/sync-sheet.mjs (downloads the published tabs) + astro build
@@ -36,9 +39,9 @@ creates stays owned by that person. A league account means nothing is lost when 
 - **Password:** keep it in a password manager, or in a sealed envelope held by a second league
   officer. At least two people should be able to get in.
 - **Create everything below while signed in as the league account** (Sheet, Form, Drive folders,
-  Photos album, GitHub, host, domain), so the league owns all of it.
+  Photos album, GitHub, host), so the league owns all of it.
 - Richard and the coordinators then work from **their own Gmail accounts**. Share things with them
-  as Editors (step 9). Nobody needs to sign in to the league account day to day.
+  as Editors (step 10). Nobody needs to sign in to the league account day to day.
 - **Storage:** the free 15 GB is shared by Gmail, Drive and Photos. Score-sheet photos are about
   2–4 MB each, roughly 0.5 GB a season. Photos will use the most. If it fills up, Google One
   100 GB is about $2/month.
@@ -51,7 +54,7 @@ teams, rules documents and Greater Boston Fall 2026 data.
 1. In Google Sheets, create a blank spreadsheet named **League Data**.
 2. For each CSV except `results.csv`: **File → Import → Upload → (choose the file) → Insert new
    sheet(s) → Import data**. Rename each tab to match: Settings, Seasons, Divisions, Locations,
-   Teams, Schedule, Playoffs, News, Documents, Contacts. Delete the empty "Sheet1".
+   Teams, Players, Schedule, Games, Playoffs, News, Documents, Contacts. Delete the empty "Sheet1".
 3. **Keep each tab's first row exactly as it is.** Those are the column names the website looks
    for. Extra columns to the right are fine and ignored.
 4. Recommended, to prevent typos: add dropdowns (**Data → Data validation**):
@@ -118,7 +121,9 @@ name. Leave "Automatically republish when changes are made" ticked.
 | Divisions | `divisions.csv` |
 | Locations | `locations.csv` |
 | Teams | `teams.csv` |
+| Players | `players.csv` |
 | Schedule | `schedule.csv` |
+| Games | `games.csv` |
 | **Results** (not "Form Responses 1") | `results.csv` |
 | Playoffs | `playoffs.csv` |
 | News | `news.csv` |
@@ -148,8 +153,11 @@ link into Settings → `photo_album_url`. A **Photos** item then appears in the 
    - Environment variable: `NODE_VERSION` = `24`
 3. In the host's settings, create a **build hook / deploy hook** and copy its URL (needed in
    step 7).
-4. Domain: register one with the league email (about $10–20/year), connect it in the host, and set
-   `site` in `astro.config.mjs`.
+4. **Web address: use the host's free one.** No custom domain, so there's nothing to buy or renew. Pick
+   the name when you create the site (e.g. `ma-senior-pool-league`), which gives an address like
+   `https://ma-senior-pool-league.netlify.app` or `https://ma-senior-pool-league.pages.dev`. Set
+   `site` in `astro.config.mjs` to it. Changing the name or host later changes the address, so choose
+   once. A custom domain can still be added at any time without rebuilding anything.
 
 *Free-tier limits change, so check the host's current numbers. Expect roughly 100 builds a month
 in season: one per batch of submissions, plus one daily.*
@@ -164,10 +172,65 @@ in season: one per batch of submissions, plus one daily.*
    (Google warns that the app is unverified: click *Advanced → Go to …*).
 4. Reload the spreadsheet. A **League website** menu appears with **Update website now**.
 
-The site now rebuilds about 6 minutes after each form submission, every morning at 5 AM, and when
-anyone uses the menu. Google takes a few minutes to refresh published tabs, hence the delay.
+The site now rebuilds about 6 minutes after each form submission, within about 20 minutes of any
+change to the spreadsheet (a check runs every 15 minutes), every morning at 5 AM, and when anyone
+uses the menu. It also emails the score-sheet reader about each new submission (step 8). Google takes a few minutes to refresh published tabs, hence the delay.
 
-## 8. Settings tab
+## 8. Reading score sheets (for player stats)
+
+Player stats come from the **Games** tab: one row per game, saying who played and who won. Someone
+has to turn each score-sheet photo into those 16 rows. The league pays for nothing, so by default a
+**volunteer's own AI agent** does it.
+
+**First, rosters.** Fill the Players tab with one row per player (team, full name). Add
+`also_known_as` only for nicknames that aren't a first name (for example "PC"). First names are
+matched automatically when only one player on the team has that name.
+
+### 8A. A volunteer's own AI agent (default)
+
+1. Set `site_url` in Settings to the website's address. The emails then link to the instructions.
+2. Set `reader_email` in Settings to the volunteer's email (several are allowed, comma-separated).
+   Each new submission sends them a **"New score sheet to read"** email with the match, the
+   captain's score, the photo link and the spreadsheet row.
+3. Share the League Data sheet (Editor) and the form's photo folder (Viewer) with the volunteer's
+   Google account.
+4. The volunteer gives their agent the instructions at **`/score-sheet-agent/`** on the website
+   (plain text at `/score-sheet-agent.md`; source `docs/SCORE_SHEET_AGENT.md`). They connect the
+   agent to their Google account, and have it run when the email arrives or on a schedule. An agent
+   that can't write to Sheets produces tab-separated rows for the volunteer to paste.
+5. The website rebuilds by itself after the agent adds rows. The **Data check** page lists sheets
+   still waiting to be read and any reading that doesn't add up.
+
+Handing over to a new volunteer means changing `reader_email` and the sharing in steps 2–3.
+Nothing else changes.
+
+### 8B. Automatic reader (optional, paid)
+
+If the league ever has a way to pay (about $15–25 a season), `google/score-sheet-reader.gs` reads
+every photo with Claude through Anthropic's API, with nobody involved. It writes the same Games rows
+as an agent would.
+
+1. Create an Anthropic account (console.anthropic.com) with the league email. Add a card and a
+   small amount of credit, turn on auto-reload, and set a monthly spend limit.
+2. Create an API key. In Apps Script: **Project Settings → Script properties** → add
+   `ANTHROPIC_API_KEY` = the key.
+3. In the Apps Script editor click **+ → Script**, name it `score-sheet-reader`, and paste in
+   [`google/score-sheet-reader.gs`](../google/score-sheet-reader.gs).
+4. **Services (+) → Drive API → Add**. It's used to get a resized copy of each photo, which also
+   converts iPhone photos.
+5. Run **setUp** again and approve the new permissions. The log should say "Automatic (paid)
+   reader: on".
+6. Set `alert_email` in Settings. An email arrives only when a sheet needs a look or couldn't be
+   read.
+7. Test with a real photo. Within about 10 minutes, Form Responses 1 shows **Reader status: read**
+   and the Games tab gets 16 rows.
+
+It checks each reading the same way the website does: 4 games per round, one winner each, and
+totals equal to the captain's score. A failed check is reread more carefully, then flagged in the
+check column. The photos (with players' names) go to Anthropic's API, which by default doesn't use
+API data to train its models. Its live API call hasn't been tested yet.
+
+## 9. Settings tab
 
 | key | value |
 | --- | --- |
@@ -178,8 +241,13 @@ anyone uses the menu. Google takes a few minutes to refresh published tabs, henc
 | `show_score_sheet_links` | `yes` to show "View" links to uploaded score sheets |
 | `rules_url` | When the rules change: link to the new rules (Google Doc or PDF). The Rules page then points there instead of the July 2024 text |
 | `bca_rules_url`, `wpa_rules_url`, `upa_rules_url` | Links to those rule books |
+| `player_names` | `initial` (default) shows "Michael R." on the website; `full` shows "Michael Rowley" |
+| `player_min_games` | Games needed to appear in the player leaders table (default 30) |
+| `site_url` | The website's address; used in the "New score sheet to read" emails |
+| `reader_email` | Who gets a "New score sheet to read" email for each submission (comma-separated for several) |
+| `alert_email` | Where the optional automatic reader sends "needs a look" emails |
 
-## 9. Hand over
+## 10. Hand over
 
 - Share the **League Data** sheet, the **form** (as collaborator) and the **website documents**
   Drive folder with Richard's own Gmail as **Editor**. Coordinators get Editor on the sheet only if

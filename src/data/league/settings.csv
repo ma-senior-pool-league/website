@@ -8,3 +8,8 @@ rules_url,
 bca_rules_url,
 wpa_rules_url,
 upa_rules_url,
+player_names,initial
+player_min_games,30
+alert_email,
+site_url,
+reader_email,

@@ -1,10 +1,10 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import StandingsTable from '../../../components/StandingsTable.astro';
-import MatchTable from '../../../components/MatchTable.astro';
-import { byWeek, getLeague, isPlayed, seasonStatusLabel } from '../../../lib/league';
-import { formatDate, formatTime, todayISO } from '../../../lib/format';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import StandingsTable from '../../../../components/StandingsTable.astro';
+import MatchTable from '../../../../components/MatchTable.astro';
+import { byWeek, getLeague, isPlayed, seasonStatusLabel } from '../../../../lib/league';
+import { formatDate, formatTime, todayISO } from '../../../../lib/format';
 
 export const getStaticPaths = (() =>
   getLeague().seasons.flatMap((season) =>
@@ -38,6 +38,15 @@ const allThursdays = matches.every((m) => new Date(`${m.date}T00:00:00Z`).getUTC
 
   <h2>Standings</h2>
   <StandingsTable caption={`${division.name} — ${season.name}`} rows={season.standings.get(division.id)!} />
+  {
+    season.playerStats.has(division.id) && (
+      <p>
+        <a class="button outline" href={`/seasons/${season.id}/${division.id}/players/`}>
+          Player stats
+        </a>
+      </p>
+    )
+  }
 
   <h2>Schedule &amp; results</h2>
   {

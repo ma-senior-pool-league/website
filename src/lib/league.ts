@@ -68,6 +68,39 @@ export interface Match {
   awayScore: number | null;
   /** Links to uploaded score sheets (Google Drive), if any. */
   scoreSheetUrls: string[];
+  /** Individual games (from the Games tab), if the score sheet has been read. */
+  games: Game[];
+}
+
+export interface Player {
+  id: string;
+  /** Roster team. */
+  teamId: string;
+  name: string;
+  /** Other names people write on score sheets (first name, nickname). */
+  aliases: string[];
+  /** Not on the Players tab: created from a name written on a score sheet. */
+  provisional: boolean;
+}
+
+export interface Game {
+  match: Match;
+  /** 1–4 for the regular rounds, 5 for tie-breakers; 0 if not given. */
+  round: number;
+  awayPlayerId: string;
+  homePlayerId: string;
+  winner: 'home' | 'away';
+}
+
+export interface PlayerStatRow {
+  player: Player;
+  /** Wins and losses by week number. */
+  weeks: Map<number, { wins: number; losses: number }>;
+  wins: number;
+  losses: number;
+  games: number;
+  /** Wins / games, 0–1. */
+  winPct: number;
 }
 
 export interface StandingRow {
@@ -108,6 +141,10 @@ export interface Season {
   divisionIds: string[];
   standings: Map<string, StandingRow[]>;
   playoffs: PlayoffMatch[];
+  /** Player standings per division, best win % first. Only divisions with game data. */
+  playerStats: Map<string, PlayerStatRow[]>;
+  /** Per division: how many played matches have their games on the Games tab. */
+  gameCoverage: Map<string, { withGames: number; played: number }>;
 }
 
 export interface NewsItem {
@@ -145,6 +182,10 @@ export interface Settings {
   bcaRulesUrl: string;
   wpaRulesUrl: string;
   upaRulesUrl: string;
+  /** How player names appear on the site: "Michael Rowley" (full) or "Michael R." (initial). */
+  playerNames: 'full' | 'initial';
+  /** Games a player needs to appear in the leaders table. */
+  playerMinGames: number;
 }
 
 export interface League {
@@ -154,6 +195,8 @@ export interface League {
   locationById: Map<string, Location>;
   teams: Team[];
   teamById: Map<string, Team>;
+  players: Player[];
+  playerById: Map<string, Player>;
   /** Newest first. */
   seasons: Season[];
   seasonById: Map<string, Season>;
@@ -269,6 +312,57 @@ function computeStandings(matches: Match[], teamIds: string[], teamById: Map<str
   );
 }
 
+/** "home"/"away" (or visitor, a team name, or the winning player's name as written). */
+function parseWinner(value: string, home: Team, away: Team, homePlayer: string, awayPlayer: string): 'home' | 'away' | null {
+  const v = value.trim().toLowerCase();
+  if (!v) return null;
+  if (['home', 'h'].includes(v) || slugify(v) === home.id || v === homePlayer.trim().toLowerCase()) return 'home';
+  if (['away', 'a', 'visitor', 'visitors', 'visiting', 'v'].includes(v) || slugify(v) === away.id || v === awayPlayer.trim().toLowerCase()) {
+    return 'away';
+  }
+  return null;
+}
+
+/** Player standings from individual games: best win %, then most wins. */
+function computePlayerStats(matches: Match[], playerById: Map<string, Player>): PlayerStatRow[] {
+  const rows = new Map<string, PlayerStatRow>();
+  const tally = (playerId: string, week: number, won: boolean) => {
+    let row = rows.get(playerId);
+    if (!row) {
+      row = { player: playerById.get(playerId)!, weeks: new Map(), wins: 0, losses: 0, games: 0, winPct: 0 };
+      rows.set(playerId, row);
+    }
+    const wk = row.weeks.get(week) ?? { wins: 0, losses: 0 };
+    if (won) {
+      wk.wins++;
+      row.wins++;
+    } else {
+      wk.losses++;
+      row.losses++;
+    }
+    row.weeks.set(week, wk);
+    row.games++;
+  };
+  for (const m of matches) {
+    for (const g of m.games) {
+      tally(g.awayPlayerId, m.week, g.winner === 'away');
+      tally(g.homePlayerId, m.week, g.winner === 'home');
+    }
+  }
+  for (const row of rows.values()) row.winPct = row.games ? row.wins / row.games : 0;
+  return [...rows.values()].sort(
+    (a, b) => b.winPct - a.winPct || b.wins - a.wins || a.player.name.localeCompare(b.player.name),
+  );
+}
+
+/** A player's name as shown on the site, per the player_names setting. */
+export function playerName(player: Player, settings: Settings): string {
+  if (settings.playerNames === 'full') return player.name;
+  const parts = player.name.split(' ');
+  if (parts.length < 2) return player.name;
+  return `${parts[0]} ${parts[parts.length - 1]!.charAt(0).toUpperCase()}.`;
+}
+
 // ---- loader ----------------------------------------------------------------
 
 let cache: League | undefined;
@@ -367,6 +461,8 @@ export function getLeague(): League {
       divisionIds: [],
       standings: new Map(),
       playoffs: [],
+      playerStats: new Map(),
+      gameCoverage: new Map(),
     }));
     if (ok && parseBool(get(r, 'current'))) markedCurrent.push(slugify(get(r, 'id') || get(r, 'name')));
   }
@@ -417,6 +513,7 @@ export function getLeague(): League {
       homeScore: null,
       awayScore: null,
       scoreSheetUrls: [],
+      games: [],
     };
     matchByKey.set(key, match);
     season!.matches.push(match);
@@ -488,6 +585,150 @@ export function getLeague(): League {
     match.awayScore = awayScore;
     match.scoreSheetUrls.push(...urls);
     resultRowFor.set(match, r.n);
+  }
+
+  // ---- players (rosters) --------------------------------------------------
+  const playerById = new Map<string, Player>();
+  const norm = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase();
+  const firstWord = (s: string) => norm(s).split(' ')[0] ?? '';
+  for (const r of readTable('players.csv', problems)) {
+    const team = lookup(teamById, get(r, 'team'));
+    const name = get(r, 'name').replace(/\s+/g, ' ');
+    if (!team) {
+      report('players.csv', r.n, `Team "${get(r, 'team')}" isn't on the Teams tab; player skipped.`);
+      continue;
+    }
+    if (!name) {
+      report('players.csv', r.n, 'Name is blank.');
+      continue;
+    }
+    const id = slugify(`${team.id} ${name}`);
+    if (playerById.has(id)) {
+      report('players.csv', r.n, `${name} is listed twice for ${team.name}.`);
+      continue;
+    }
+    const aliases = get(r, 'also_known_as')
+      .split(/[,;]/)
+      .map((a) => a.trim())
+      .filter(Boolean);
+    playerById.set(id, { id, teamId: team.id, name, aliases, provisional: false });
+  }
+
+  /**
+   * Finds the player meant by a name written on a score sheet: the full name, a listed
+   * nickname, or a first name that only one player on that team has. A full name from
+   * another team's roster counts too (substitutes). Anything else becomes a new player.
+   */
+  const reportedNames = new Set<string>();
+  function resolvePlayer(teamId: string, written: string, file: string, row: number): Player | undefined {
+    const w = norm(written);
+    if (!w) return undefined;
+    const listed = [...playerById.values()].filter((p) => !p.provisional);
+    const roster = listed.filter((p) => p.teamId === teamId);
+    const exact = roster.find((p) => norm(p.name) === w) ?? roster.find((p) => p.aliases.some((a) => norm(a) === w));
+    if (exact) return exact;
+    const sameFirst = roster.filter(
+      (p) => firstWord(p.name) === firstWord(w) || p.aliases.some((a) => norm(a) === firstWord(w)),
+    );
+    if (sameFirst.length === 1) return sameFirst[0];
+    const elsewhere = listed.filter((p) => norm(p.name) === w);
+    if (elsewhere.length === 1) return elsewhere[0];
+
+    const team = teamById.get(teamId)!;
+    const id = slugify(`${teamId} ${written}`);
+    let player = playerById.get(id);
+    if (!player) {
+      player = { id, teamId, name: written.trim().replace(/\s+/g, ' '), aliases: [], provisional: true };
+      playerById.set(id, player);
+    }
+    if (!reportedNames.has(id)) {
+      reportedNames.add(id);
+      report(
+        file,
+        row,
+        sameFirst.length > 1
+          ? `"${written}" could be more than one ${team.name} player (${sameFirst.map((p) => p.name).join(', ')}); ` +
+              'counted separately for now. Write the full name in the Games tab.'
+          : `"${written}" isn't on the Players tab for ${team.name}; counted as a new player. Add them to the Players tab.`,
+      );
+    }
+    return player;
+  }
+
+  // ---- games (one row per game, written by the score-sheet reader) ---------
+  for (const r of readTable('games.csv', problems)) {
+    const f = 'games.csv';
+    const season = lookup(seasonById, get(r, 'season'));
+    const home = lookup(teamById, get(r, 'home_team'));
+    const away = lookup(teamById, get(r, 'away_team'));
+    const errs = [
+      !season && `season "${get(r, 'season')}" isn't on the Seasons tab`,
+      !home && `home team "${get(r, 'home_team')}" isn't on the Teams tab`,
+      !away && `away team "${get(r, 'away_team')}" isn't on the Teams tab`,
+    ].filter(Boolean);
+    if (errs.length) {
+      report(f, r.n, `Game skipped: ${errs.join('; ')}.`);
+      continue;
+    }
+    const weekRaw = get(r, 'week');
+    const week = Number(weekRaw);
+    let match = weekRaw ? matchByKey.get(matchKey(season!.id, week, home!.id, away!.id)) : undefined;
+    if (!match) {
+      const candidates = season!.matches.filter((m) => m.homeId === home!.id && m.awayId === away!.id);
+      if (candidates.length === 1) match = candidates[0];
+    }
+    if (!match) {
+      report(
+        f,
+        r.n,
+        `Game skipped: no ${season!.name} match on the Schedule tab for ${away!.name} at ${home!.name}` +
+          (weekRaw ? ` in week ${weekRaw}` : '') +
+          '.',
+      );
+      continue;
+    }
+    const winner = parseWinner(get(r, 'winner'), home!, away!, get(r, 'home_player'), get(r, 'away_player'));
+    if (!get(r, 'away_player') || !get(r, 'home_player') || !winner) {
+      report(
+        f,
+        r.n,
+        `Game skipped: ${!winner ? `winner "${get(r, 'winner')}" should be home or away` : 'a player name is blank'}.`,
+      );
+      continue;
+    }
+    const awayPlayer = resolvePlayer(away!.id, get(r, 'away_player'), f, r.n)!;
+    const homePlayer = resolvePlayer(home!.id, get(r, 'home_player'), f, r.n)!;
+    const check = get(r, 'check');
+    if (check) report(f, r.n, `Flagged by the score-sheet reader: ${check} Clear the check cell once it's right.`);
+    const round = Number(get(r, 'round'));
+    match.games.push({
+      match,
+      round: Number.isInteger(round) && round > 0 ? round : 0,
+      awayPlayerId: awayPlayer.id,
+      homePlayerId: homePlayer.id,
+      winner,
+    });
+  }
+
+  // Each match's games must add up to its result.
+  for (const season of seasonById.values()) {
+    for (const m of season.matches) {
+      if (!m.games.length) continue;
+      const awayWins = m.games.filter((g) => g.winner === 'away').length;
+      const homeWins = m.games.length - awayWins;
+      const regular = m.games.filter((g) => g.round >= 1 && g.round <= 4).length;
+      const label = `${season.name} week ${m.week}, ${teamById.get(m.awayId)!.name} at ${teamById.get(m.homeId)!.name}`;
+      if (m.homeScore !== null && (awayWins !== m.awayScore || homeWins !== m.homeScore)) {
+        problems.push({
+          file: 'games.csv',
+          message:
+            `${label}: the games add up to ${awayWins}–${homeWins}, but the result is ` +
+            `${m.awayScore}–${m.homeScore}. Check this match's rows.`,
+        });
+      } else if (regular && regular !== 16) {
+        problems.push({ file: 'games.csv', message: `${label}: ${regular} regular games are listed; a match has 16.` });
+      }
+    }
   }
 
   // ---- playoffs -----------------------------------------------------------
@@ -611,6 +852,11 @@ export function getLeague(): League {
     bcaRulesUrl: webSetting('bca_rules_url'),
     wpaRulesUrl: webSetting('wpa_rules_url'),
     upaRulesUrl: webSetting('upa_rules_url'),
+    playerNames: norm(raw.get('player_names') ?? '') === 'full' ? 'full' : 'initial',
+    playerMinGames: (() => {
+      const n = Number(raw.get('player_min_games') || 30);
+      return Number.isFinite(n) && n >= 0 ? n : 30;
+    })(),
   };
 
   // ---- current season -----------------------------------------------------
@@ -635,6 +881,14 @@ export function getLeague(): League {
       const matches = season.matches.filter((m) => m.divisionId === divisionId);
       const teamIds = [...new Set(matches.flatMap((m) => [m.homeId, m.awayId]))];
       season.standings.set(divisionId, computeStandings(matches, teamIds, teamById));
+
+      const played = matches.filter(isPlayed);
+      season.gameCoverage.set(divisionId, {
+        withGames: played.filter((m) => m.games.length).length,
+        played: played.length,
+      });
+      const stats = computePlayerStats(matches, playerById);
+      if (stats.length) season.playerStats.set(divisionId, stats);
     }
   }
 
@@ -653,6 +907,8 @@ export function getLeague(): League {
     locationById,
     teams,
     teamById,
+    players: [...playerById.values()],
+    playerById,
     seasons,
     seasonById,
     currentSeason: current!,

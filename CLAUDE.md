@@ -37,6 +37,20 @@ open questions), [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md),
   reported as problems.
 - `google/apps-script.gs` runs in the Sheet and POSTs the host's deploy hook (after form submits,
   daily, and from a menu).
+- `google/apps-script.gs` also emails Settings `reader_email` about each submission, and its
+  `watchForChanges` trigger (every 15 minutes) rebuilds the site when any tab's values change.
+- **Score-sheet reading, default:** the league pays for nothing. A volunteer's own AI agent follows
+  `docs/SCORE_SHEET_AGENT.md`, which the site publishes at `/score-sheet-agent/` and as raw text at
+  `/score-sheet-agent.md`. It writes Games rows and Reader status. Keep that doc agent-agnostic (no
+  product names) and self-contained (no repo-relative links).
+- **Optional, off:** `google/score-sheet-reader.gs` is the paid automatic reader (Claude Messages API
+  over raw HTTP, structured JSON output, `claude-opus-5-5`, effort `low` then `medium`, key in
+  Script Properties `ANTHROPIC_API_KEY`). Its SYSTEM_PROMPT and SCORE_SHEET_AGENT.md describe the
+  same reading rules; keep them in step.
+- Player stats: `games.csv` + `players.csv` → `season.playerStats` per division. Player names are
+  resolved within the team (full name, also_known_as, unique first name; a full name from another
+  roster for subs); unknown names become provisional players and a Problem. Public display uses
+  `playerName()` (Settings `player_names`: initial | full).
 - Rules in `src/content/rules/` are a word-for-word transcription of the league's July 2024 rules
   PDF; don't reword them. When rules change, the commissioner sets `rules_url` in Settings and the
   Rules page links there instead.

@@ -20,7 +20,9 @@ the website directly.
 | Divisions | The four divisions | Rarely |
 | Locations | Playing locations and phone numbers | When something changes |
 | Teams | Team name, division, home location | Each season |
+| Players | Each team's roster: team, full name, and any nickname | Each season, and when someone joins |
 | Schedule | One row per match | Each season |
+| Games | One row per game, read from the score-sheet photos by a volunteer's AI agent | Filled in by the reader; fix only if flagged |
 | Form Responses 1 | Score sheets sent in through the form (scores + photo links) | Fills itself in |
 | Results | A copy of the scores for the website. **Don't type here**, it updates itself | Never |
 | Playoffs | Playoff matches and results | Playoff time |
@@ -46,6 +48,23 @@ their name under "Submitted on behalf of". Coordinators can do the same.
 
 Games won **include tie-breaker games**. A match never ends tied.
 
+**Player stats come from the photos.** A volunteer (Michael, to start) has their own AI agent
+read each new score-sheet photo: who played and who won each game. It writes 16 rows per match to
+the Games tab. The volunteer gets a "New score sheet to read" email for every submission. The
+player standings on the website update from those rows, so you don't tally anything.
+
+**If a reading doesn't add up**, for example the games total 8–8 but the captain entered 7–9, the
+Data check page lists it. Open the Games tab, find that match's rows, and compare them with the
+photo (the link is in the first row's **sheet** column). Fix the wrong row, then delete the note in
+the **check** column. Data check also lists sheets still waiting to be read, and any name that
+doesn't match a roster. For those, add the player to the Players tab, or fix the name on the Games
+tab.
+
+**Changing who reads score sheets:** put the new volunteer's email in Settings → `reader_email`,
+and share the spreadsheet (Editor) and the photo folder (Viewer) with them. They point their own
+AI agent at the instructions page on the website (`/score-sheet-agent/`). If nobody is reading
+sheets for a while, nothing breaks: team standings still update, and player stats catch up later.
+
 **Fixing a mistake:** open the **Form Responses 1** tab, correct the number in the row (or delete
 the row), then choose **League website → Update website now** from the menu at the top of the
 spreadsheet.
@@ -56,10 +75,12 @@ spreadsheet.
    When it starts: set its status to `In progress`, put `yes` under **current**, and remove `yes`
    from the old season (set that one to `Final`).
 2. **Teams tab:** add, remove or move teams between divisions.
-3. **Schedule tab:** one row per match: season, week, date, time, division, home team, away team.
+3. **Players tab:** update each team's roster (team, full name). Add a nickname under
+   **also_known_as** only if people write something other than the first name (for example "PC").
+4. **Schedule tab:** one row per match: season, week, date, time, division, home team, away team.
    You can copy last season's rows and change them.
-4. **Form:** update the Season and team lists in the score-sheet form's dropdowns.
-5. Choose **League website → Update website now**, wait 15 minutes, then open **Data check**.
+5. **Form:** update the Season and team lists in the score-sheet form's dropdowns.
+6. Choose **League website → Update website now**, wait 15 minutes, then open **Data check**.
 
 ## Other updates
 

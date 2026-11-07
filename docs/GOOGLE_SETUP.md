@@ -34,14 +34,28 @@ is stored in the form owner's Drive and counts against that account's storage. A
 creates stays owned by that person. A league account means nothing is lost when people change.
 
 - Create a free Gmail account named for the league (pick any available name).
-- **Recovery:** add Richard's mobile number and personal email as recovery options, and turn on
-  2-Step Verification.
-- **Password:** keep it in a password manager, or in a sealed envelope held by a second league
-  officer. At least two people should be able to get in.
+- **Two people can always sign in** (Richard and Michael to start), and neither has to wait for the
+  other:
+  - **Recovery:** Google allows one recovery phone and one recovery email. Use Richard's mobile as
+    the recovery phone and Michael's personal email as the recovery email, so either can recover
+    the account alone.
+  - **Password:** keep it where both can reach it: a shared password-manager entry, or a sealed
+    copy each.
+  - **2-Step Verification:** turn it on, but don't tie it to one phone. When setting up an
+    authenticator app, scan the same QR code on both phones before finishing. Also print the
+    backup codes (Google Account → Security → 2-Step Verification → Backup codes), one set each.
+  - When one of them hands over, change the password and their recovery option, and get new
+    backup codes.
 - **Create everything below while signed in as the league account** (Sheet, Form, Drive folders,
-  Photos album, GitHub, host), so the league owns all of it.
-- Richard and the coordinators then work from **their own Gmail accounts**. Share things with them
-  as Editors (step 10). Nobody needs to sign in to the league account day to day.
+  Photos album, GitHub, host), so the league owns all of it. In Drive, make one top-level folder,
+  **MA Senior Pool League**, and keep the League Data sheet, the form and the website documents
+  folder inside it.
+- **Day to day, everyone works from their own Google account.** Sharing the top-level folder with
+  Richard and Michael (step 10) shares everything inside it. Nobody signs in to the league account
+  except for setup and the occasional admin task.
+- **A file belongs to whoever creates it,** even inside the shared folder. Create league files as
+  the league account, or move them over afterwards: **Share →** the league account **→ Transfer
+  ownership**, then accept the request in the league account's Gmail.
 - **Storage:** the free 15 GB is shared by Gmail, Drive and Photos. Score-sheet photos are about
   2–4 MB each, roughly 0.5 GB a season. Photos will use the most. If it fills up, Google One
   100 GB is about $2/month.
@@ -99,9 +113,10 @@ teams, rules documents and Greater Boston Fall 2026 data.
 
    This copies only Season through Score sheet photo, and updates itself as responses arrive.
 6. *Optional, if Richard wants to approve results before they go live:* type `Approved` in the first
-   empty header cell of "Form Responses 1" (column L), insert checkboxes below it, and change the
-   formula to `select C, D, E, F, G, H, I, L`. Unticked results are held back and counted on
-   `/data-check/`.
+   empty header cell of "Form Responses 1" (column L, if you do this before step 7), insert
+   checkboxes below it, and change the formula to
+   `=QUERY('Form Responses 1'!A:L, "select C, D, E, F, G, H, I, L where C is not null", 1)`.
+   Unticked results are held back and counted on `/data-check/`.
 7. **Score-sheet photos** land in Drive in a folder named after the form ("… (File responses)").
    Keep its general access **Restricted**. Share it (Viewer) with the coordinators who should see
    completed sheets. In Settings, `show_score_sheet_links` = `yes` adds a "View" link next to each
@@ -168,8 +183,10 @@ in season: one per batch of submissions, plus one daily.*
    [`google/apps-script.gs`](../google/apps-script.gs) and save.
 2. **Project Settings** (gear icon) → **Script properties** → add `DEPLOY_HOOK_URL` = the hook URL
    from step 6.
-3. Back in the editor, choose **setUp** in the toolbar and click **Run**. Approve the permissions
-   (Google warns that the app is unverified: click *Advanced → Go to …*).
+3. **Signed in as the league account**, choose **setUp** in the toolbar and click **Run**. Approve
+   the permissions (Google warns that the app is unverified: click *Advanced → Go to …*). The
+   automatic jobs belong to whoever runs setUp. Run from a personal account, the reader emails would
+   come from that person, and everything would stop if their access were removed.
 4. Reload the spreadsheet. A **League website** menu appears with **Update website now**.
 
 The site now rebuilds about 6 minutes after each form submission, within about 20 minutes of any
@@ -218,7 +235,7 @@ as an agent would.
    [`google/score-sheet-reader.gs`](../google/score-sheet-reader.gs).
 4. **Services (+) → Drive API → Add**. It's used to get a resized copy of each photo, which also
    converts iPhone photos.
-5. Run **setUp** again and approve the new permissions. The log should say "Automatic (paid)
+5. Run **setUp** again, as the league account, and approve the new permissions. The log should say "Automatic (paid)
    reader: on".
 6. Set `alert_email` in Settings. An email arrives only when a sheet needs a look or couldn't be
    read.
@@ -249,9 +266,11 @@ API data to train its models. Its live API call hasn't been tested yet.
 
 ## 10. Hand over
 
-- Share the **League Data** sheet, the **form** (as collaborator) and the **website documents**
-  Drive folder with Richard's own Gmail as **Editor**. Coordinators get Editor on the sheet only if
-  they'll be updating it.
+- Share the top-level **MA Senior Pool League** folder (step 1) with Richard's and Michael's own
+  Google accounts as **Editor**. That covers the League Data sheet and the website documents
+  folder. Also add them as collaborators on the **form**, share the form's **photo folder** with
+  them (step 3), and invite them to the **Photos album**. Coordinators get Editor on the sheet only
+  if they'll be updating it.
 - Give Richard [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md) and have him bookmark
   `/data-check/`.
 - **End-to-end test:** submit a test score sheet, wait about 15 minutes, and check the division

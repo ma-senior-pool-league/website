@@ -115,7 +115,8 @@ the site updates about 10–15 minutes after a change, not instantly.
     and emails. What's OK to be public?
 11. **Web address and accounts:** the site will use the host's free address (e.g.
     ma-senior-pool-league.netlify.app), so there's nothing to renew. Any preferred name? We'll create a
-    league Google account to own everything. Who besides you should have its password?
+    league Google account to own everything, which you and Michael can both sign in to (day to day
+    you'd each use your own account). Should anyone else have access?
 12. **Past seasons:** do you have earlier results and standings you'd like archived on the site?
 13. **Rosters:** could you send each team's roster for all four divisions (the one you use for the
     player stats)?

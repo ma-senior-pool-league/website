@@ -252,6 +252,27 @@ export function parseTime(value: string): string | null {
   return `${pad(h)}:${pad(min)}`;
 }
 
+/**
+ * A Google Form timestamp ("11/9/2026 8:45:05", "2026-11-09 8:45:05 AM", or a Sheets serial
+ * number like 46335.36 if the column lost its date format) as a sortable
+ * "YYYY-MM-DD HH:MM:SS", or '' if blank or unreadable.
+ */
+export function parseTimestamp(value: string): string {
+  const s = value.trim();
+  if (/^\d{5}(\.\d+)?$/.test(s)) {
+    const d = new Date(Date.UTC(1899, 11, 30) + Math.round(Number(s) * 86400) * 1000);
+    return d.toISOString().slice(0, 19).replace('T', ' ');
+  }
+  const [datePart = '', ...rest] = s.split(/\s+/);
+  const date = parseDate(datePart);
+  if (!date) return '';
+  const m = rest.join(' ').toUpperCase().match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/);
+  if (!m) return `${date} 00:00:00`;
+  let h = Number(m[1]);
+  if (m[4]) h = (h % 12) + (m[4] === 'PM' ? 12 : 0);
+  return `${date} ${pad(h)}:${m[2]}:${m[3] ?? '00'}`;
+}
+
 const parseBool = (v: string) => /^(yes|y|true|x|1|✓|✔)$/i.test(v.trim());
 const parseCount = (v: string): number | null => (/^\d+$/.test(v.trim()) ? Number(v.trim()) : null);
 const isLink = (v: string) => /^https?:\/\/\S+$/i.test(v) || /^\/\S*$/.test(v);
@@ -523,7 +544,8 @@ export function getLeague(): League {
   let pendingApproval = 0;
   const resultRows = readTable('results.csv', problems);
   const hasApproval = resultRows.some((r) => 'approved' in r.v);
-  const resultRowFor = new Map<Match, number>();
+  // Which row each match's result came from, and when it was sent in ('' = typed or pasted in).
+  const resultFrom = new Map<Match, { row: number; at: string }>();
   for (const r of resultRows) {
     const f = 'results.csv';
     if (hasApproval && !parseBool(get(r, 'approved'))) {
@@ -568,23 +590,31 @@ export function getLeague(): League {
     const urls = get(r, 'score_sheet')
       .split(/[\s,]+/)
       .filter((u) => isWebLink(u));
-    if (match.homeScore !== null) {
+    const at = parseTimestamp(get(r, 'timestamp'));
+    const prev = resultFrom.get(match);
+    if (match.homeScore !== null && prev) {
       if (match.homeScore === homeScore && match.awayScore === awayScore) {
         match.scoreSheetUrls.push(...urls); // same result submitted twice: keep both sheets
         continue;
       }
+      // The later submission wins. Google Forms adds each response above any rows that were
+      // pasted in, so row order alone can't tell; rows without a timestamp count as oldest.
+      const newer = at >= prev.at;
+      const used = newer ? r.n : prev.row;
       report(
         f,
         r.n,
         `Two different results for week ${match.week}, ${away!.name} at ${home!.name} ` +
-          `(row ${resultRowFor.get(match)} and row ${r.n}); using row ${r.n}. Delete the wrong one.`,
+          `(row ${Math.min(prev.row, r.n)} and row ${Math.max(prev.row, r.n)}); using row ${used}` +
+          `${at || prev.at ? ', the one sent in later' : ''}. Delete the wrong one.`,
       );
+      if (!newer) continue;
       match.scoreSheetUrls = [];
     }
     match.homeScore = homeScore;
     match.awayScore = awayScore;
     match.scoreSheetUrls.push(...urls);
-    resultRowFor.set(match, r.n);
+    resultFrom.set(match, { row: r.n, at });
   }
 
   // ---- players (rosters) --------------------------------------------------

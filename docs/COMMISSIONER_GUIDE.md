@@ -67,7 +67,8 @@ sheets for a while, nothing breaks: team standings still update, and player stat
 
 **Fixing a mistake:** open the **Form Responses 1** tab, correct the number in the row (or delete
 the row), then choose **League website → Update website now** from the menu at the top of the
-spreadsheet.
+spreadsheet. If a captain sends the form again with a corrected score, the newer one counts
+automatically, and `/data-check/` lists both rows so the old one can be deleted.
 
 ## Before each season
 

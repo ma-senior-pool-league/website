@@ -122,19 +122,21 @@ teams, rules documents and Greater Boston Fall 2026 data.
    "Form Responses 1", starting in the **Season** column. Its columns line up: Season, Week, Home
    team, Away team, Home games, Away games, Score sheet photo. Leave Timestamp and Email blank.
    Where the Email column sits depends on when email collection was turned on, so go by the
-   column names, not letters.
+   column names, not letters. Google Forms puts each new response right under the header, above
+   these pasted rows. That's fine: the website goes by the Timestamp, not the row, to tell which
+   of two different results for a match was sent in later.
 6. **Make a public-safe Results tab.** "Form Responses 1" contains submitters' email addresses, so
    it must never be published. Add a new tab named **Results** and put this in cell A1:
 
    ```text
-   =LET(r, 'Form Responses 1'!A:Z, h, CHOOSEROWS(r, 1), FILTER(CHOOSECOLS(r, XMATCH({"Season","Week","Home team","Away team","Home team games won","Away team games won","Score sheet photo"}, h)), CHOOSECOLS(r, XMATCH("Season", h)) <> ""))
+   =LET(r, 'Form Responses 1'!A:Z, h, CHOOSEROWS(r, 1), FILTER(CHOOSECOLS(r, XMATCH({"Season","Week","Home team","Away team","Home team games won","Away team games won","Score sheet photo","Timestamp"}, h)), CHOOSECOLS(r, XMATCH("Season", h)) <> ""))
    ```
 
-   This copies only Season through Score sheet photo, finding them by their column names, and
-   updates itself as responses arrive. If you ever rename a form question, change it here too.
+   This copies only Season through Score sheet photo, plus the Timestamp, finding them by their
+   column names, and updates itself as responses arrive. If you ever rename a form question, change it here too.
 7. *Optional, if Richard wants to approve results before they go live:* type `Approved` in the first
    empty header cell of "Form Responses 1", insert checkboxes below it, and add `,"Approved"` after
-   `"Score sheet photo"` in the formula. Unticked results are held back and counted on
+   `"Timestamp"` in the formula. Unticked results are held back and counted on
    `/data-check/`.
 8. **Score-sheet photos** land in Drive in a folder named after the form ("… (File responses)").
    Keep its general access **Restricted**. Share it (Viewer) with the coordinators who should see

@@ -32,7 +32,7 @@ export const TABLES = {
   },
   'results.csv': {
     required: ['season', 'home', 'away', 'home_score', 'away_score'],
-    optional: ['week', 'approved', 'score_sheet'],
+    optional: ['week', 'approved', 'score_sheet', 'timestamp'],
     optionalFile: true,
     aliases: {
       home_team: 'home',

@@ -32,6 +32,8 @@ open questions), [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md),
 - Results come from a Google Form (via a Results tab whose formula picks the form's columns by name), so `results.csv` accepts the form's question
   titles as headers (aliases), matches by season+week+home+away (falling back to a unique
   home/away pairing), tolerates duplicate submissions, and honors an optional `approved` column.
+  When two different results conflict, the later `timestamp` wins, not the later row: Google Forms
+  inserts each response under the header, above any pasted-in rows (which have no timestamp).
 - Each schedule row carries its `division`, so past seasons keep their grouping even if a team moves.
 - Standings: matches won, then games won, then name. Scores include tie-breaker games, so ties are
   reported as problems.

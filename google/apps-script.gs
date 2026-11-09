@@ -18,8 +18,9 @@
  *   2. Choose the setUp function in the toolbar, click Run, and approve the permissions.
  *
  * Google takes up to 5 minutes to refresh a published tab after an edit, so a rebuild
- * is scheduled about 6 minutes out rather than run immediately. Changes close together
- * share one rebuild.
+ * runs about 6 minutes after the last change rather than immediately. Each new change
+ * pushes a waiting rebuild back, so changes close together share one rebuild and none
+ * of them is missed.
  */
 
 const HOOK_PROPERTY = 'DEPLOY_HOOK_URL';
@@ -154,9 +155,16 @@ function runScheduledRebuild() {
   runRebuild();
 }
 
+/**
+ * Schedules a rebuild DELAY_MINUTES from now, replacing any that's waiting. Keeping an
+ * earlier one could rebuild before Google has refreshed the published copy of this change,
+ * and nothing would rebuild again until the next change or the morning.
+ */
 function scheduleRebuild_() {
-  const pending = ScriptApp.getProjectTriggers().some((t) => t.getHandlerFunction() === 'runScheduledRebuild');
-  if (!pending) ScriptApp.newTrigger('runScheduledRebuild').timeBased().after(DELAY_MINUTES * 60 * 1000).create();
+  ScriptApp.getProjectTriggers().forEach((t) => {
+    if (t.getHandlerFunction() === 'runScheduledRebuild') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('runScheduledRebuild').timeBased().after(DELAY_MINUTES * 60 * 1000).create();
 }
 
 function getHookUrl_() {

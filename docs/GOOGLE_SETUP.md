@@ -235,9 +235,9 @@ in season: one per batch of submissions, plus one daily.*
    come from that person, and everything would stop if their access were removed.
 4. Reload the spreadsheet. A **League website** menu appears with **Update website now**.
 
-The site now rebuilds about 6 minutes after each form submission, within about 20 minutes of any
-change to the spreadsheet (a check runs every 15 minutes), every morning at 5 AM, and when anyone
-uses the menu. It also emails the score-sheet reader about each new submission (step 8). Google takes a few minutes to refresh published tabs, hence the delay.
+The site now rebuilds about 6 minutes after each form submission (after the last one, if several
+come in close together), within about 20 minutes of any change to the spreadsheet (a check runs
+every 15 minutes), every morning at 5 AM, and when anyone uses the menu. It also emails the score-sheet reader about each new submission (step 8). Google takes a few minutes to refresh published tabs, hence the delay.
 
 ## 8. Reading score sheets (for player stats)
 

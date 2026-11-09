@@ -212,6 +212,11 @@ with the link can see the album.
    `site` in `astro.config.mjs` to it. Changing the name or host later changes the address, so settle
    it before the site is announced (renaming during the preview is harmless). A custom domain can
    still be added at any time without rebuilding anything.
+5. **New Netlify sites start Private:** only people signed in to the league's Netlify account can
+   see them; everyone else gets an error page. Keep it that way during the preview. Click **Make
+   public** on the site's overview page before showing Richard (step 10). While it's private, a
+   reader's AI agent can't open `/score-sheet-agent.md`; give it `docs/SCORE_SHEET_AGENT.md` from
+   GitHub instead.
 
 *Free-tier limits change, so check the host's current numbers. Expect roughly 100 builds a month
 in season: one per batch of submissions, plus one daily.*
@@ -312,7 +317,8 @@ improve the site for as long as needed.
    page and `/data-check/`. Then delete the test row from "Form Responses 1" and click **Update
    website now**.
 2. **Show Richard the running site** along with the documents, and go through the questions in
-   [PROJECT_PLAN.md](PROJECT_PLAN.md) ("Questions for Richard").
+   [PROJECT_PLAN.md](PROJECT_PLAN.md) ("Questions for Richard"). First make the Netlify site
+   public (step 6), or he'll get an error page.
 3. **Let him sign in to the league account** (step 1), signed in as the league account:
    - On his phone, he adds a passkey (Security & sign-in → Passkeys and security keys → Create a
      passkey).

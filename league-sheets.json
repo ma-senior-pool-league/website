@@ -1,18 +1,18 @@
 {
   "_help": "Links to each tab of the league Google Sheet, published as CSV (File > Share > Publish to web). Leave a link empty to keep using the copy in src/data/league/. See docs/GOOGLE_SETUP.md.",
   "tabs": {
-    "settings.csv": "",
-    "seasons.csv": "",
-    "divisions.csv": "",
-    "locations.csv": "",
-    "teams.csv": "",
-    "players.csv": "",
-    "schedule.csv": "",
-    "results.csv": "",
-    "games.csv": "",
-    "playoffs.csv": "",
-    "news.csv": "",
-    "documents.csv": "",
-    "contacts.csv": ""
+    "settings.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=0&single=true&output=csv",
+    "seasons.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=264811008&single=true&output=csv",
+    "divisions.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=2072251971&single=true&output=csv",
+    "locations.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=1731944212&single=true&output=csv",
+    "teams.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=529919261&single=true&output=csv",
+    "players.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=629567622&single=true&output=csv",
+    "schedule.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=1436100733&single=true&output=csv",
+    "results.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=1429614526&single=true&output=csv",
+    "games.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=1761764109&single=true&output=csv",
+    "playoffs.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=1849564957&single=true&output=csv",
+    "news.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=495875439&single=true&output=csv",
+    "documents.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=22652134&single=true&output=csv",
+    "contacts.csv": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTVSp9SELd237_3cdT3z4YIy6cxSt295r3dv8DiWhBVY-tApzxUmTSpbOMJoyunHqMB1i1LyvYhuILC/pub?gid=1941397024&single=true&output=csv"
   }
 }

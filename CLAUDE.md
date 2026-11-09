@@ -29,7 +29,7 @@ open questions), [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md),
   that names the tab, row and fix. Don't add validation that fails the build.
 - People type names, not ids; ids/URLs are `slugify(name)` (or an optional `id` column). Dates and
   times accept US Sheets formats (`parseDate`, `parseTime`).
-- Results come from a Google Form (via a QUERY tab), so `results.csv` accepts the form's question
+- Results come from a Google Form (via a Results tab whose formula picks the form's columns by name), so `results.csv` accepts the form's question
   titles as headers (aliases), matches by season+week+home+away (falling back to a unique
   home/away pairing), tolerates duplicate submissions, and honors an optional `approved` column.
 - Each schedule row carries its `division`, so past seasons keep their grouping even if a team moves.

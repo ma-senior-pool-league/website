@@ -68,7 +68,9 @@ for (const [file, rawUrl] of entries) {
     }
     const missing = missingColumns(file, headerRow(text));
     if (missing.length) throw new Error(`the first row is missing column(s): ${missing.join(', ')}`);
-    fs.writeFileSync(path.join(dataDir, file), text.endsWith('\n') ? text : `${text}\n`);
+    // Google sends Windows line endings; store plain ones so a rebuild doesn't rewrite every file.
+    const csv = text.replace(/\r\n?/g, '\n');
+    fs.writeFileSync(path.join(dataDir, file), csv.endsWith('\n') ? csv : `${csv}\n`);
     status.files[file] = 'updated';
     console.log(`[sync] ✓ ${file}`);
   } catch (err) {

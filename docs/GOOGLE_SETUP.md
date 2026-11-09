@@ -4,6 +4,11 @@ For the person setting the site up (Michael). Allow an afternoon. Once this is d
 runs everything from Google, and nobody needs to touch code for routine updates. Richard's
 day-to-day instructions are in [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md).
 
+**Preview first.** Steps 1–9 give only Michael access. The site runs at its real address with the
+preview banner up, so it can be tested and improved for as long as needed. Nothing costs money,
+and nothing is announced. Step 10 brings Richard in once the site is ready to show: he sees the
+running site and the documents together, and gets access then.
+
 ## How it fits together
 
 ```text
@@ -33,26 +38,32 @@ Yes, use a dedicated account rather than yours or Richard's. Everything uploaded
 is stored in the form owner's Drive and counts against that account's storage. Anything a person
 creates stays owned by that person. A league account means nothing is lost when people change.
 
-- Create a free Gmail account named for the league (pick any available name).
-- **Two people can always sign in** (Richard and Michael to start), and neither has to wait for the
-  other:
-  - **Recovery:** Google allows one recovery phone and one recovery email. Use Richard's mobile as
-    the recovery phone and Michael's personal email as the recovery email, so either can recover
-    the account alone.
-  - **Password:** keep it where both can reach it: a shared password-manager entry, or a sealed
-    copy each.
-  - **2-Step Verification:** turn it on, but don't tie it to one phone. When setting up an
-    authenticator app, scan the same QR code on both phones before finishing. Also print the
-    backup codes (Google Account → Security → 2-Step Verification → Backup codes), one set each.
-  - When one of them hands over, change the password and their recovery option, and get new
-    backup codes.
+- Create a free Gmail account named for the league (pick any available name), with the name
+  **MA Senior Pool League**. That's what people see on emails it sends.
+- **Set it up for Michael alone for now.** Step 10 adds Richard, after which **two people can
+  always sign in** and neither has to wait for the other.
+  - **Sign in with a passkey, not the password.** Michael signs in to the league account on his
+    phone and adds a passkey (Google Account → Security & sign-in → Passkeys and security keys →
+    Create a passkey). From then on, signing in takes the phone's fingerprint, face or PIN, with
+    no password and no code. Leave **Skip password when possible** turned on (same page), so
+    Google offers the passkey first.
+  - **Password, as a fallback only:** Google requires one and won't let you remove it. Make it
+    long and random, and keep it in a password manager.
+  - **2-Step Verification:** turn it on, with an authenticator app. It protects signing in with
+    the password (a passkey already counts as both steps). Print the backup codes (Google Account
+    → Security & sign-in → 2-Step Verification → Backup codes).
+  - **Recovery:** Google allows one recovery phone and one recovery email. Use Michael's personal
+    email as the recovery email, and Michael's mobile as the recovery phone until step 10.
+  - **When someone hands over** (later on): remove their passkey (Passkeys and security keys) and
+    their phone (Security & sign-in → Your devices), since Android sometimes adds a passkey on its
+    own. Then change the password and their recovery option, and get new backup codes.
 - **Create everything below while signed in as the league account** (Sheet, Form, Drive folders,
-  Photos album, GitHub, host), so the league owns all of it. In Drive, make one top-level folder,
-  **MA Senior Pool League**, and keep the League Data sheet, the form and the website documents
-  folder inside it.
-- **Day to day, everyone works from their own Google account.** Sharing the top-level folder with
-  Richard and Michael (step 10) shares everything inside it. Nobody signs in to the league account
-  except for setup and the occasional admin task.
+  Photos album, web host), so the league owns all of it. The one exception is GitHub (step 6).
+  In Drive, make one top-level folder, **MA Senior Pool League**, and keep the League Data sheet,
+  the form and the website documents folder inside it.
+- **Day to day, everyone works from their own Google account.** Share the top-level folder with
+  Michael's own account as **Editor** now (step 10 adds Richard). That shares everything inside it.
+  Nobody signs in to the league account except for setup and the occasional admin task.
 - **A file belongs to whoever creates it,** even inside the shared folder. Create league files as
   the league account, or move them over afterwards: **Share →** the league account **→ Transfer
   ownership**, then accept the request in the league account's Gmail.
@@ -99,25 +110,33 @@ teams, rules documents and Greater Boston Fall 2026 data.
    | 8 | Submitted on behalf of | Short answer | Optional; for when Richard or a coordinator submits for a captain |
    | 9 | Notes | Paragraph | Optional |
 
+   Choosing **File upload** asks you to confirm that files go to the form owner's Drive and that
+   people must sign in to Google to submit. Click **Continue**.
 3. **Settings:** Responses → *Collect email addresses* = **Verified**. *Limit to 1 response* =
    **Off**, so the same person can submit many times (Richard submitting for several captains).
-4. **Load the Fall 2026 results:** open `results.csv` and paste its rows (without the header) into
-   "Form Responses 1" starting at **column C**. Its columns line up: Season, Week, Home team, Away
-   team, Home games, Away games, Score sheet photo. Leave Timestamp and Email blank.
-5. **Make a public-safe Results tab.** "Form Responses 1" contains submitters' email addresses, so
+4. **Publish the form.** Click **Publish**, then **Manage** next to Responders, and set *Responder
+   view* to **Anyone with the link** (the default, "Specific people", would shut captains out).
+   Click **Publish** again. The link under the Published button is the one for Settings →
+   `score_sheet_form_url`.
+5. **Load the Fall 2026 results:** open `results.csv` and paste its rows (without the header) into
+   "Form Responses 1", starting in the **Season** column. Its columns line up: Season, Week, Home
+   team, Away team, Home games, Away games, Score sheet photo. Leave Timestamp and Email blank.
+   Where the Email column sits depends on when email collection was turned on, so go by the
+   column names, not letters.
+6. **Make a public-safe Results tab.** "Form Responses 1" contains submitters' email addresses, so
    it must never be published. Add a new tab named **Results** and put this in cell A1:
 
    ```text
-   =QUERY('Form Responses 1'!A:K, "select C, D, E, F, G, H, I where C is not null", 1)
+   =LET(r, 'Form Responses 1'!A:Z, h, CHOOSEROWS(r, 1), FILTER(CHOOSECOLS(r, XMATCH({"Season","Week","Home team","Away team","Home team games won","Away team games won","Score sheet photo"}, h)), CHOOSECOLS(r, XMATCH("Season", h)) <> ""))
    ```
 
-   This copies only Season through Score sheet photo, and updates itself as responses arrive.
-6. *Optional, if Richard wants to approve results before they go live:* type `Approved` in the first
-   empty header cell of "Form Responses 1" (column L, if you do this before step 7), insert
-   checkboxes below it, and change the formula to
-   `=QUERY('Form Responses 1'!A:L, "select C, D, E, F, G, H, I, L where C is not null", 1)`.
-   Unticked results are held back and counted on `/data-check/`.
-7. **Score-sheet photos** land in Drive in a folder named after the form ("… (File responses)").
+   This copies only Season through Score sheet photo, finding them by their column names, and
+   updates itself as responses arrive. If you ever rename a form question, change it here too.
+7. *Optional, if Richard wants to approve results before they go live:* type `Approved` in the first
+   empty header cell of "Form Responses 1", insert checkboxes below it, and add `,"Approved"` after
+   `"Score sheet photo"` in the formula. Unticked results are held back and counted on
+   `/data-check/`.
+8. **Score-sheet photos** land in Drive in a folder named after the form ("… (File responses)").
    Keep its general access **Restricted**. Share it (Viewer) with the coordinators who should see
    completed sheets. In Settings, `show_score_sheet_links` = `yes` adds a "View" link next to each
    result on the website. Only people the folder is shared with can open it; others see "Request
@@ -125,9 +144,16 @@ teams, rules documents and Greater Boston Fall 2026 data.
 
 ## 4. Publish the tabs
 
-**File → Share → Publish to web.** For each tab below: choose the tab, choose **Comma-separated
-values (.csv)**, click **Publish**, and copy the link into `league-sheets.json` next to its file
-name. Leave "Automatically republish when changes are made" ticked.
+**File → Share → Publish to web.**
+
+1. **First limit what gets published.** Open **Published content & settings**, change "Entire
+   document" to just the tabs below (untick Entire document, then tick each one). **Leave "Form
+   Responses 1" unticked.** Publishing the entire document would make its email addresses
+   readable by anyone who guesses the tab's link. Leave "Automatically republish when changes
+   are made" ticked, then click **Start publishing**.
+2. For each tab below: choose the tab and **Comma-separated values (.csv)** under Link, and copy
+   the link into `league-sheets.json` next to its file name. (All the links share one long code
+   and differ only in `gid=`, the tab's number.)
 
 | Tab | File in `league-sheets.json` |
 | --- | --- |
@@ -154,15 +180,25 @@ Test locally: run `npm run sync`. Every tab should show ✓.
 
 ## 5. Photo album
 
-In Google Photos (league account): create an album → **Share** → turn on **Collaborate** → copy the
-link into Settings → `photo_album_url`. A **Photos** item then appears in the site menu.
+In Google Photos (league account): create an album → **Share** → **Create link** → copy the link
+into Settings → `photo_album_url`. A **Photos** item then appears in the site menu. In the album's
+**⋮ → Options**, check that **Collaborate** is on, and turn **Share photo location** off: anyone
+with the link can see the album.
 
 ## 6. Hosting (free)
 
-1. Create a GitHub account with the league email, and push this repository to it, including the
-   filled-in `league-sheets.json`. Those links are public anyway.
-2. Create a free account on **Netlify** or **Cloudflare Pages** with the league email. Connect the
-   GitHub repository with these settings:
+1. **Code: a free GitHub organization, not a league GitHub account.** GitHub allows one free
+   personal account per person and doesn't allow shared logins, so a league GitHub account would
+   break its rules (and GitHub blocks new accounts that look like extras). Instead, from Michael's
+   own GitHub account: **+ → New organization → Free**, named `ma-senior-pool-league`, contact
+   email the league's, owned by **My personal account**. Create a **private** repository in it
+   (`website`) and push this repository, including the filled-in `league-sheets.json`. Those links
+   are public anyway. Nobody needs GitHub day to day. Before Michael steps away, invite a
+   successor's own GitHub account as a second owner (organization **People → Invite member →
+   Owner**).
+2. Create a free **Netlify** account with the league email: sign up by email, not "Sign up with
+   GitHub". (Cloudflare Pages works the same way.) Add a site from GitHub, and when GitHub asks,
+   give Netlify access to the organization's `website` repository only. Use these settings:
    - Build command: `npm run build`
    - Output directory: `dist`
    - Environment variable: `NODE_VERSION` = `24`
@@ -171,8 +207,9 @@ link into Settings → `photo_album_url`. A **Photos** item then appears in the 
 4. **Web address: use the host's free one.** No custom domain, so there's nothing to buy or renew. Pick
    the name when you create the site (e.g. `ma-senior-pool-league`), which gives an address like
    `https://ma-senior-pool-league.netlify.app` or `https://ma-senior-pool-league.pages.dev`. Set
-   `site` in `astro.config.mjs` to it. Changing the name or host later changes the address, so choose
-   once. A custom domain can still be added at any time without rebuilding anything.
+   `site` in `astro.config.mjs` to it. Changing the name or host later changes the address, so settle
+   it before the site is announced (renaming during the preview is harmless). A custom domain can
+   still be added at any time without rebuilding anything.
 
 *Free-tier limits change, so check the host's current numbers. Expect roughly 100 builds a month
 in season: one per batch of submissions, plus one daily.*
@@ -264,18 +301,35 @@ API data to train its models. Its live API call hasn't been tested yet.
 | `reader_email` | Who gets a "New score sheet to read" email for each submission (comma-separated for several) |
 | `alert_email` | Where the optional automatic reader sends "needs a look" emails |
 
-## 10. Hand over
+## 10. Test, then bring Richard in
 
-- Share the top-level **MA Senior Pool League** folder (step 1) with Richard's and Michael's own
-  Google accounts as **Editor**. That covers the League Data sheet and the website documents
-  folder. Also add them as collaborators on the **form**, share the form's **photo folder** with
-  them (step 3), and invite them to the **Photos album**. Coordinators get Editor on the sheet only
-  if they'll be updating it.
-- Give Richard [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md) and have him bookmark
-  `/data-check/`.
-- **End-to-end test:** submit a test score sheet, wait about 15 minutes, and check the division
-  page and `/data-check/`. Then delete the test row from "Form Responses 1" and click **Update
-  website now**.
+Until now only Michael has access. Keep the preview banner (Settings → `notice`) up, and test and
+improve the site for as long as needed.
+
+1. **End-to-end test:** submit a test score sheet, wait about 15 minutes, and check the division
+   page and `/data-check/`. Then delete the test row from "Form Responses 1" and click **Update
+   website now**.
+2. **Show Richard the running site** along with the documents, and go through the questions in
+   [PROJECT_PLAN.md](PROJECT_PLAN.md) ("Questions for Richard").
+3. **Let him sign in to the league account** (step 1), signed in as the league account:
+   - On his phone, he adds a passkey (Security & sign-in → Passkeys and security keys → Create a
+     passkey).
+   - Change the recovery phone to his mobile. Michael's email stays the recovery email, so either
+     of them can recover the account alone.
+   - 2-Step Verification → Authenticator → **Change authenticator app**, and scan the new QR code
+     on both phones before finishing.
+   - Give him a copy of the password (a shared password-manager entry or a sealed copy) and a
+     printed set of the backup codes.
+4. **Share with his own Google account:** the top-level **MA Senior Pool League** folder as
+   **Editor** (that covers the League Data sheet and the website documents folder). Also add him
+   as a collaborator on the **form**, share the form's **photo folder** with him (step 3), and
+   invite him to the **Photos album**. Coordinators get Editor on the sheet only if they'll be
+   updating it.
+5. Give him [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md) and have him bookmark the League Data
+   sheet and `/data-check/`.
+
+**Going live:** load the remaining divisions and rosters, clear the banner, and tell the
+coordinators and captains.
 
 ## What still needs a developer
 

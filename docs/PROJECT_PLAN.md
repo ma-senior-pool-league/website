@@ -58,6 +58,11 @@ Chosen over a custom Cloudflare backend because no long-term technical maintaine
   if the league ever has a way to pay for it.
 - **Safety net:** the site never breaks on bad data. Bad rows are skipped and listed in plain
   language on a `/data-check/` page; unreadable tabs keep their last good copy.
+- **Preview first, no sign-off on paper (Michael, Nov 2026):** Michael sets everything up under the
+  league account with only his own access, runs the site at its real address with the preview
+  banner up, and improves it until he's happy. Then he shows Richard the running site and the
+  documents together. A working site is easier to judge than a description, nothing costs money,
+  and anything can still be changed.
 
 Trade-offs accepted: captains without Google accounts depend on Richard or a coordinator; uploaded
 sheets are organized by a spreadsheet (and links on the division pages), not by Drive sub-folders;
@@ -95,7 +100,8 @@ the site updates about 10–15 minutes after a change, not instantly.
 
 ## Questions for Richard
 
-*(Plain language, ready to paste into a reply.)*
+*(Plain language, ready to paste into a reply. To go through when Richard first sees the running
+site.)*
 
 1. Could you send the Fall 2026 **schedules and results for Central Mass, Metro West and North
    East**? Do all divisions play Thursdays at 11:00 AM?
@@ -113,10 +119,11 @@ the site updates about 10–15 minutes after a change, not instantly.
 9. **Photos:** who may add photos, and do we need players' consent to post them?
 10. **Contacts to publish:** how you'd like to be listed, and the four Division Coordinators' names
     and emails. What's OK to be public?
-11. **Web address and accounts:** the site will use the host's free address (e.g.
-    ma-senior-pool-league.netlify.app), so there's nothing to renew. Any preferred name? We'll create a
-    league Google account to own everything, which you and Michael can both sign in to (day to day
-    you'd each use your own account). Should anyone else have access?
+11. **Web address and accounts:** the site uses the host's free address (e.g.
+    ma-senior-pool-league.netlify.app), so there's nothing to renew. It can still be renamed before
+    it's announced: any preferred name? A league Google account owns everything, and you and
+    Michael can both sign in to it (day to day you'd each use your own account). Should anyone else
+    have access?
 12. **Past seasons:** do you have earlier results and standings you'd like archived on the site?
 13. **Rosters:** could you send each team's roster for all four divisions (the one you use for the
     player stats)?
@@ -131,11 +138,15 @@ the site updates about 10–15 minutes after a change, not instantly.
 
 - **Phase 1: Public site (built).** Real locations, rules, Greater Boston Fall 2026 data, forms,
   playoffs, news, contacts; all routine content driven from Sheet-shaped data.
-- **Phase 2: Google setup (next).** League account, League Data sheet, score-sheet form, photo
-  album, hosting with automatic rebuilds. Follow [GOOGLE_SETUP.md](GOOGLE_SETUP.md).
-- **Phase 3: Go live.** Other divisions' data, answers to the questions above, clear the
-  preview banner, walk Richard through [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md), first live
-  week with real submissions.
+- **Phase 2: Google setup and preview (next).** League account, League Data sheet, score-sheet
+  form, photo album, hosting with automatic rebuilds, all with only Michael's access. Follow
+  [GOOGLE_SETUP.md](GOOGLE_SETUP.md) steps 1–9, then test with practice score sheets and improve
+  the running site until Michael is happy with it.
+- **Phase 3: Show Richard.** Walk him through the running site and the documents, including
+  [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md), go through the questions above, and give him
+  access (setup step 10).
+- **Phase 4: Go live.** Other divisions' data and rosters, the answers to the questions, clear the
+  preview banner, tell the coordinators and captains, first live week with real submissions.
 - **Later / optional:** sort uploaded score sheets into season/division Drive folders automatically
   (small Apps Script); past-season archive; printable schedule pages.
 
@@ -148,7 +159,10 @@ the site updates about 10–15 minutes after a change, not instantly.
   emails). Only put public-OK details on Contacts.
 - Google can take up to 5 minutes to refresh a published tab, so updates appear about 10–15 minutes
   after a change.
-- Keep every account (Google, GitHub, host) in the league's name, with at least two people
-  able to get in, so the site survives volunteer turnover.
+- Keep the Google and web host accounts in the league's name, with at least two people able to
+  get in, so the site survives volunteer turnover. The code is the exception: GitHub allows one
+  free personal account per person, so it lives in a free GitHub organization
+  (`ma-senior-pool-league`) owned by Michael's own GitHub account. Add a second owner before he
+  steps away.
 - Accessibility for older users stays a hard requirement: large text, high contrast, big buttons,
   simple navigation.

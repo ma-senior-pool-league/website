@@ -1,5 +1,10 @@
 # MA Senior Pool League website
 
+> **Looking for standings, schedules or results?** They're on the league website,
+> **https://ma-senior-pool-league.netlify.app**. This page only holds the code behind it, for the
+> volunteers who maintain the site. The data files here are starter copies and may be out of date:
+> the league's Google Sheet is the real source.
+
 Website for the MA Senior Pool League, a Massachusetts senior 8-ball travel league: standings,
 division schedules and results by season, playoffs, playing locations, rules, printable forms,
 score-sheet submission, photos and news. The main audience is the four Division Coordinators and

@@ -191,9 +191,11 @@ with the link can see the album.
    personal account per person and doesn't allow shared logins, so a league GitHub account would
    break its rules (and GitHub blocks new accounts that look like extras). Instead, from Michael's
    own GitHub account: **+ → New organization → Free**, named `ma-senior-pool-league`, contact
-   email the league's, owned by **My personal account**. Create a **private** repository in it
-   (`website`) and push this repository, including the filled-in `league-sheets.json`. Those links
-   are public anyway. Nobody needs GitHub day to day. Before Michael steps away, invite a
+   email the league's, owned by **My personal account**. Create a **public** repository in it
+   (`website`) and push this repository, including the filled-in `league-sheets.json`. Netlify's
+   free plan only builds an organization's repository if it's public. Nothing in it is secret: the
+   Sheet links are public anyway, and the README's first lines send anyone who finds it to the
+   website. Nobody needs GitHub day to day. Before Michael steps away, invite a
    successor's own GitHub account as a second owner (organization **People → Invite member →
    Owner**).
 2. Create a free **Netlify** account with the league email: sign up by email, not "Sign up with

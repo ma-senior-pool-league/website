@@ -1,7 +1,7 @@
 # MA Senior Pool League website
 
 > **Looking for standings, schedules or results?** They're on the league website,
-> **https://ma-senior-pool-league.netlify.app**. This page only holds the code behind it, for the
+> **https://ma-senior-pool-league.pages.dev**. This page only holds the code behind it, for the
 > volunteers who maintain the site. The data files here are starter copies and may be out of date:
 > the league's Google Sheet is the real source.
 

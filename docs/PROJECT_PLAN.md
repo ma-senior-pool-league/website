@@ -32,8 +32,8 @@ Google** (Sheets, Forms, Drive, Photos) without touching code.
 Chosen over a custom Cloudflare backend because no long-term technical maintainer is expected. See
 [GOOGLE_SETUP.md](GOOGLE_SETUP.md) for the full setup.
 
-- **The website** stays a static Astro site on a free host (Netlify or Cloudflare Pages), at the
-  host's free address (e.g. `ma-senior-pool-league.netlify.app`). There's no custom domain, so
+- **The website** stays a static Astro site on a free host (Cloudflare Pages), at the host's free
+  address, `ma-senior-pool-league.pages.dev`. There's no custom domain, so
   nothing to renew. It
   rebuilds itself from the league Google Sheet: after each score-sheet submission, daily, and on
   demand from a menu in the Sheet. A small Apps Script does the triggering.
@@ -61,6 +61,10 @@ Chosen over a custom Cloudflare backend because no long-term technical maintaine
   so standings don't wait for the reading and the reading has something to be checked against.
   Once a sheet is read, the captain gets an email listing every game as read, and replies to fix
   anything.
+- **Hosting on Cloudflare Pages (Nov 2026):** Netlify was set up first, but its free plan now
+  allows only about 20 builds a month (15 of its 300 monthly credits each) and pauses the site
+  when they run out; the first day of testing used 75%. Cloudflare Pages' free plan allows 500
+  builds a month, and if they ever run out the site stays up and just stops updating.
 - **Safety net:** the site never breaks on bad data. Bad rows are skipped and listed in plain
   language on a `/data-check/` page; unreadable tabs keep their last good copy.
 - **Preview first, no sign-off on paper (Michael, Nov 2026):** Michael sets everything up under the
@@ -125,7 +129,7 @@ site.)*
 10. **Contacts to publish:** how you'd like to be listed, and the four Division Coordinators' names
     and emails. What's OK to be public?
 11. **Web address and accounts:** the site uses the host's free address (e.g.
-    ma-senior-pool-league.netlify.app), so there's nothing to renew. It can still be renamed before
+    ma-senior-pool-league.pages.dev), so there's nothing to renew. It can still be renamed before
     it's announced: any preferred name? A league Google account owns everything, and you and
     Michael can both sign in to it (day to day you'd each use your own account). Should anyone else
     have access?

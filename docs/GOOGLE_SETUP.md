@@ -23,7 +23,7 @@ Captain's phone ──► Google Form (score sheet photo + score)
    Apps Script asks the host to rebuild (after a form submit, within ~20 min of any tab change,
    daily, or on demand)
                         ▼
-   Web host (Netlify or Cloudflare Pages) runs `npm run build`
+   Web host (Cloudflare Pages) runs `npm run build`
      = scripts/sync-sheet.mjs (downloads the published tabs) + astro build
                         ▼
                  The public website  (+ /data-check/ page listing any rows it skipped)
@@ -197,34 +197,37 @@ with the link can see the album.
    break its rules (and GitHub blocks new accounts that look like extras). Instead, from Michael's
    own GitHub account: **+ → New organization → Free**, named `ma-senior-pool-league`, contact
    email the league's, owned by **My personal account**. Create a **public** repository in it
-   (`website`) and push this repository, including the filled-in `league-sheets.json`. Netlify's
-   free plan only builds an organization's repository if it's public. Nothing in it is secret: the
-   Sheet links are public anyway, and the README's first lines send anyone who finds it to the
-   website. Nobody needs GitHub day to day. Before Michael steps away, invite a
+   (`website`) and push this repository, including the filled-in `league-sheets.json`. Nothing in
+   it is secret: the Sheet links are public anyway, and the README's first lines send anyone who
+   finds it to the website. Nobody needs GitHub day to day. Before Michael steps away, invite a
    successor's own GitHub account as a second owner (organization **People → Invite member →
    Owner**).
-2. Create a free **Netlify** account with the league email: sign up by email, not "Sign up with
-   GitHub". (Cloudflare Pages works the same way.) Add a site from GitHub, and when GitHub asks,
-   give Netlify access to the organization's `website` repository only. Use these settings:
+2. Create a free **Cloudflare** account with the league email (https://dash.cloudflare.com/sign-up;
+   skip adding a domain). **Workers & Pages → Create → Pages → Import an existing Git repository
+   → Connect GitHub**. When GitHub asks, install *Cloudflare Workers and Pages* on the
+   `ma-senior-pool-league` organization with access to the `website` repository only. Use these
+   settings:
+   - Project name: `ma-senior-pool-league`
    - Build command: `npm run build`
-   - Output directory: `dist`
+   - Build output directory: `dist`
    - Environment variable: `NODE_VERSION` = `24`
-3. In the host's settings, create a **build hook / deploy hook** and copy its URL (needed in
-   step 7).
+3. In the project's **Settings → Build → Deploy hooks**, add a hook for the `main` branch and copy
+   its URL (needed in step 7). Treat it like a password: anyone who has it can trigger builds.
 4. **Web address: use the host's free one.** No custom domain, so there's nothing to buy or renew. Pick
-   the name when you create the site (e.g. `ma-senior-pool-league`), which gives an address like
-   `https://ma-senior-pool-league.netlify.app` or `https://ma-senior-pool-league.pages.dev`. Set
+   the name when you create the site (`ma-senior-pool-league`), which gives
+   `https://ma-senior-pool-league.pages.dev`. Set
    `site` in `astro.config.mjs` to it. Changing the name or host later changes the address, so settle
    it before the site is announced (renaming during the preview is harmless). A custom domain can
    still be added at any time without rebuilding anything.
-5. **New Netlify sites start Private:** only people signed in to the league's Netlify account can
-   see them; everyone else gets an error page. Keep it that way during the preview. Click **Make
-   public** on the site's overview page before showing Richard (step 10). While it's private, a
-   reader's AI agent can't open `/score-sheet-agent.md`; give it `docs/SCORE_SHEET_AGENT.md` from
-   GitHub instead.
+5. **During the preview** the site is reachable by anyone who has its address, but nothing links
+   to it. Put `yes` next to `hide_from_search` on the Settings tab so search engines don't list
+   it, and change it to `no` when the site is announced.
 
-*Free-tier limits change, so check the host's current numbers. Expect roughly 100 builds a month
-in season: one per batch of submissions, plus one daily.*
+*Expect roughly 100 builds a month in season: one per batch of changes, plus one daily.
+Cloudflare Pages' free plan allows 500 a month; if that's ever used up, the site stays up and
+just stops updating until the next month. Netlify was tried first, but its free plan (since
+2025) allows only about 20 builds a month, and pauses the site when they run out. Free-tier
+limits change, so check the host's current numbers once a year.*
 
 ## 7. Automatic updates (Apps Script)
 
@@ -312,6 +315,7 @@ API data to train its models. Its live API call hasn't been tested yet.
 | `site_url` | The website's address; used in the "New score sheet to read" emails |
 | `reader_email` | Who gets a "New score sheet to read" email for each submission (comma-separated for several) |
 | `captain_emails` | `no` stops the "here's what we read" emails to captains (they're on otherwise) |
+| `hide_from_search` | `yes` asks search engines not to list the site (for the preview); `no` once it's announced |
 | `alert_email` | Where the optional automatic reader sends "needs a look" emails |
 
 ## 10. Test, then bring Richard in
@@ -324,8 +328,7 @@ improve the site for as long as needed.
    (within 15 minutes of the Reader status being set). Then delete the test row from "Form Responses 1" and click **Update
    website now**.
 2. **Show Richard the running site** along with the documents, and go through the questions in
-   [PROJECT_PLAN.md](PROJECT_PLAN.md) ("Questions for Richard"). First make the Netlify site
-   public (step 6), or he'll get an error page.
+   [PROJECT_PLAN.md](PROJECT_PLAN.md) ("Questions for Richard").
 3. **Let him sign in to the league account** (step 1), signed in as the league account:
    - On his phone, he adds a passkey (Security & sign-in → Passkeys and security keys → Create a
      passkey).
@@ -343,7 +346,8 @@ improve the site for as long as needed.
 5. Give him [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md) and have him bookmark the League Data
    sheet and `/data-check/`.
 
-**Going live:** load the remaining divisions and rosters, clear the banner, and tell the
+**Going live:** load the remaining divisions and rosters, clear the banner, set
+`hide_from_search` to `no`, and tell the
 coordinators and captains.
 
 ## What still needs a developer

@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
   // The host's free address (canonical URLs, sitemaps, social-share tags). No custom domain.
-  site: 'https://ma-senior-pool-league.netlify.app',
+  site: 'https://ma-senior-pool-league.pages.dev',
   output: 'static',
   trailingSlash: 'always',
   build: {

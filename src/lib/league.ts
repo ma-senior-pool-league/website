@@ -186,6 +186,8 @@ export interface Settings {
   playerNames: 'full' | 'initial';
   /** Games a player needs to appear in the leaders table. */
   playerMinGames: number;
+  /** Ask search engines not to list the site (for the preview, before it's announced). */
+  hideFromSearch: boolean;
 }
 
 export interface League {
@@ -909,6 +911,7 @@ export function getLeague(): League {
       const n = Number(raw.get('player_min_games') || 30);
       return Number.isFinite(n) && n >= 0 ? n : 30;
     })(),
+    hideFromSearch: parseBool(raw.get('hide_from_search') ?? ''),
   };
 
   // ---- current season -----------------------------------------------------

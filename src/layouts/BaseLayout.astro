@@ -24,6 +24,7 @@ const nav = site.nav.filter((item) => !item.requires || settings[item.requires])
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    {settings.hideFromSearch && <meta name="robots" content="noindex, nofollow" />}
     <title>{fullTitle}</title>
     <slot name="head" />
   </head>

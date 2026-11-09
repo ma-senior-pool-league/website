@@ -38,7 +38,9 @@ open questions), [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md),
 - Standings: matches won, then games won, then name. Scores include tie-breaker games, so ties are
   reported as problems.
 - `google/apps-script.gs` runs in the Sheet and POSTs the host's deploy hook (after form submits,
-  daily, and from a menu).
+  daily, and from a menu). The host is Cloudflare Pages (`ma-senior-pool-league.pages.dev`, free
+  plan: 500 builds/month). Netlify's free plan (~20 builds/month) was too small; don't go back.
+- Settings `hide_from_search` = yes adds a robots `noindex` meta tag (used during the preview).
 - `google/apps-script.gs` also emails Settings `reader_email` about each submission, and its
   `watchForChanges` trigger (every 15 minutes) rebuilds the site when any tab's values change.
 - The form asks only for home/visiting team, both scores, photo (required) and notes. On submit,

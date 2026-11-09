@@ -41,6 +41,11 @@ open questions), [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md),
   daily, and from a menu).
 - `google/apps-script.gs` also emails Settings `reader_email` about each submission, and its
   `watchForChanges` trigger (every 15 minutes) rebuilds the site when any tab's values change.
+- The form asks only for home/visiting team, both scores, photo (required) and notes. On submit,
+  the script fills Season and Week into the response from the Schedule tab (nearest scheduled match
+  before the timestamp); `league.ts` infers them too if still blank. Once Reader status is
+  read/check/failed, `watchForChanges` emails the submitter what was read (Settings
+  `captain_emails`, replies to `contact_email`) and stamps "Captain emailed".
 - **Score-sheet reading, default:** the league pays for nothing. A volunteer's own AI agent follows
   `docs/SCORE_SHEET_AGENT.md`, which the site publishes at `/score-sheet-agent/` and as raw text at
   `/score-sheet-agent.md`. It writes Games rows and Reader status. Keep that doc agent-agnostic (no

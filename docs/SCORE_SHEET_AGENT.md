@@ -25,8 +25,14 @@ If you can read the photos but can't write to the Sheet, see
 Open the tab **Form Responses 1**. Each row is one match a captain sent in. A row needs reading when
 it has a link under **Score sheet photo** and its **Reader status** cell is empty.
 
-Columns you use: Season, Week, Home team, Away team, Home team games won, Away team games won, Score
-sheet photo, Reader status, Reader note. Don't change any other column.
+Columns you use: Season, Week, Home team, Visiting team, Home team games won, Visiting team games
+won, Score sheet photo, Reader status, Reader note. Older rows say "Away team" instead of "Visiting
+team". Don't change any other column.
+
+Captains don't type the season or week; they're filled in automatically from the **Schedule** tab.
+If either is blank, work it out yourself: on the Schedule tab, find the match with the same home
+and visiting teams whose date is closest before the **Timestamp** (the day the sheet was sent in),
+and use its season and week. The date written on the score sheet should agree.
 
 ## 2. Read the score sheet
 
@@ -64,9 +70,9 @@ if they're on another team's roster.
 
 - There are **16 regular games: 4 in each of rounds 1–4**.
 - **Every game has exactly one winner.**
-- **Visiting wins and home wins equal the captain's score** on the form ("Away team games won" and
-  "Home team games won"), including any tie-breaker games. If the form's score is blank, compare
-  with the sheet's Total Wins.
+- **Visiting wins and home wins equal the captain's score** on the form ("Visiting team games won"
+  and "Home team games won"), including any tie-breaker games. If the form's score is blank,
+  compare with the sheet's Total Wins.
 
 If something still doesn't add up after a careful second look, write the rows anyway and put a
 short note in the **check** column of the match's first row, for example "Round 3, B vs 4: mark
@@ -80,10 +86,10 @@ is. The columns:
 
 | Column | What goes in it |
 | --- | --- |
-| season | As on the form, e.g. `Fall 2026` |
-| week | As on the form, e.g. `9` |
-| away_team | The visiting team, as on the form |
-| home_team | The home team, as on the form |
+| season | As on the response, e.g. `Fall 2026` |
+| week | As on the response, e.g. `9` |
+| away_team | The visiting team, as on the response |
+| home_team | The home team, as on the response |
 | round | `1`–`4`, or `5` for a tie-breaker game |
 | away_player | The visiting player (full roster name when clear) |
 | home_player | The home player (full roster name when clear) |
@@ -105,10 +111,16 @@ Back on **Form Responses 1**, set the row's **Reader status** to:
 
 Then put a one-line **Reader note**, e.g. "16 games, 7–9, matches the form."
 
+About 15 minutes later the captain who sent the sheet gets an email listing every game from your
+Games rows, so they can check it. Use full roster names where you can, since the captain reads
+them. Your check note, or for `failed` your Reader note, is included in that email, so write it in
+plain words a captain will understand.
+
 ## Rules
 
-- Only add or replace rows on the **Games** tab, and fill **Reader status** and **Reader note**.
-  Don't edit any other tab or what captains submitted.
+- Only add or replace rows on the **Games** tab, and fill **Reader status** and **Reader note**
+  (and a blank Season or Week, as above). Don't edit any other tab or what captains submitted,
+  and leave the **Captain emailed** column alone.
 - Keep the photos and players' names within the league's Google account and your volunteer. Don't
   post or share them anywhere else.
 

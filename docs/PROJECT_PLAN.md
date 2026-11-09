@@ -56,6 +56,11 @@ Chosen over a custom Cloudflare backend because no long-term technical maintaine
   problems and unread sheets on `/data-check/`. A fully automatic reader using Anthropic's API
   (`google/score-sheet-reader.gs`, about $15–25 a season) is built but off; it can be turned on
   if the league ever has a way to pay for it.
+- **Short score-sheet form (Michael, Nov 2026):** captains pick the two teams, type both scores
+  and add the photo. The season and week come from the Schedule tab. The score stays on the form
+  so standings don't wait for the reading and the reading has something to be checked against.
+  Once a sheet is read, the captain gets an email listing every game as read, and replies to fix
+  anything.
 - **Safety net:** the site never breaks on bad data. Bad rows are skipped and listed in plain
   language on a `/data-check/` page; unreadable tabs keep their last good copy.
 - **Preview first, no sign-off on paper (Michael, Nov 2026):** Michael sets everything up under the

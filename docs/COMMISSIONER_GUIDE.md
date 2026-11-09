@@ -38,13 +38,18 @@ on the Teams tab. Capital letters and extra spaces don't matter.
 
 ## Every week: score sheets
 
-**Captains** open the form from the website (**Forms → Open the score sheet form**), take a photo
-of the sheet, type the games won for each team, and submit. The home team's captain should send it
-in.
+**Captains** open the form from the website (**Forms → Open the score sheet form**), pick the two
+teams, type the games won for each team, add a photo of the sheet, and submit. The season and week
+fill themselves in from the Schedule tab. The home team's captain should send it in.
+
+**Captains get an email back** once the sheet has been read, listing every game as it was read,
+so they can check it. Their replies go to the Settings tab's `contact_email`. To turn these emails
+off, put `no` next to `captain_emails` on the Settings tab.
 
 **Captain without a Google account?** They text or email you a photo of the score sheet. You open
 the same form (you're signed in with your Gmail), fill it in for them, attach the photo, and put
-their name under "Submitted on behalf of". Coordinators can do the same.
+"Sent in for" and their name under Notes. The "here's what we read" email then comes to you.
+Coordinators can do the same.
 
 Games won **include tie-breaker games**. A match never ends tied.
 
@@ -80,7 +85,8 @@ automatically, and `/data-check/` lists both rows so the old one can be deleted.
    **also_known_as** only if people write something other than the first name (for example "PC").
 4. **Schedule tab:** one row per match: season, week, date, time, division, home team, away team.
    You can copy last season's rows and change them.
-5. **Form:** update the Season and team lists in the score-sheet form's dropdowns.
+5. **Form:** update the team lists in the score-sheet form's two dropdowns. The Schedule tab
+   must be filled in before the first match, since the season and week come from it.
 6. Choose **League website → Update website now**, wait 15 minutes, then open **Data check**.
 
 ## Other updates

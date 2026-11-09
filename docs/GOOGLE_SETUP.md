@@ -100,39 +100,42 @@ teams, rules documents and Greater Boston Fall 2026 data.
 
    | # | Question title | Type | Notes |
    | --- | --- | --- | --- |
-   | 1 | Season | Dropdown | e.g. `Fall 2026`. Must match the Seasons tab |
-   | 2 | Week | Dropdown | 1, 2, 3 … 15 |
-   | 3 | Home team | Dropdown | All team names, exactly as on the Teams tab |
-   | 4 | Away team | Dropdown | Same list |
-   | 5 | Home team games won | Short answer | Response validation: Number, ≥ 0. Include tie-breaker games |
-   | 6 | Away team games won | Short answer | Same |
-   | 7 | Score sheet photo | File upload | Allow images and PDF; max 5 files; 10 MB |
-   | 8 | Submitted on behalf of | Short answer | Optional; for when Richard or a coordinator submits for a captain |
-   | 9 | Notes | Paragraph | Optional |
+   | 1 | Home team | Dropdown | All team names, exactly as on the Teams tab |
+   | 2 | Visiting team | Dropdown | Same list |
+   | 3 | Home team games won | Short answer | Response validation: Number, ≥ 0. Include tie-breaker games |
+   | 4 | Visiting team games won | Short answer | Same |
+   | 5 | Score sheet photo | File upload | **Required.** Allow images and PDF; max 5 files; 10 MB |
+   | 6 | Notes | Paragraph | Optional. Description: "Anything we should know, e.g. sent in for captain Bob Smith." |
 
    Choosing **File upload** asks you to confirm that files go to the form owner's Drive and that
    people must sign in to Google to submit. Click **Continue**.
-3. **Settings:** Responses → *Collect email addresses* = **Verified**. *Limit to 1 response* =
-   **Off**, so the same person can submit many times (Richard submitting for several captains).
+
+   There's no Season or Week question: the Sheet's script (step 7) fills both in from the
+   Schedule tab, using the two teams and the date. Everything else on the photo is read later,
+   and the captain gets an email with what was read so they can check it. The captain's score
+   stays on the form because standings use it right away, and it's the check on the reading.
+3. **Settings:** Responses → *Collect email addresses* = **Verified** (that's where the "here's
+   what we read" email goes). *Limit to 1 response* = **Off**, so the same person can submit many
+   times (Richard submitting for several captains). Presentation → *Confirmation message*:
+   "Thank you! We'll email you what we read from your score sheet so you can check it."
 4. **Publish the form.** Click **Publish**, then **Manage** next to Responders, and set *Responder
    view* to **Anyone with the link** (the default, "Specific people", would shut captains out).
    Click **Publish** again. The link under the Published button is the one for Settings →
    `score_sheet_form_url`.
-5. **Load the Fall 2026 results:** open `results.csv` and paste its rows (without the header) into
-   "Form Responses 1", starting in the **Season** column. Its columns line up: Season, Week, Home
-   team, Away team, Home games, Away games, Score sheet photo. Leave Timestamp and Email blank.
-   Where the Email column sits depends on when email collection was turned on, so go by the
-   column names, not letters. Google Forms puts each new response right under the header, above
+5. **Load the Fall 2026 results:** in "Form Responses 1", type `Season` and `Week` into the first
+   two empty header cells. Then copy each column of `results.csv` (without its header) into the
+   column with the same name; its "Away team" columns go under "Visiting team". Leave Timestamp
+   and Email blank. Go by the column names, not letters. Google Forms puts each new response right under the header, above
    these pasted rows. That's fine: the website goes by the Timestamp, not the row, to tell which
    of two different results for a match was sent in later.
 6. **Make a public-safe Results tab.** "Form Responses 1" contains submitters' email addresses, so
    it must never be published. Add a new tab named **Results** and put this in cell A1:
 
    ```text
-   =LET(r, 'Form Responses 1'!A:Z, h, CHOOSEROWS(r, 1), FILTER(CHOOSECOLS(r, XMATCH({"Season","Week","Home team","Away team","Home team games won","Away team games won","Score sheet photo","Timestamp"}, h)), CHOOSECOLS(r, XMATCH("Season", h)) <> ""))
+   =LET(r, 'Form Responses 1'!A:Z, h, CHOOSEROWS(r, 1), FILTER(CHOOSECOLS(r, XMATCH({"Season","Week","Home team","Visiting team","Home team games won","Visiting team games won","Score sheet photo","Timestamp"}, h)), CHOOSECOLS(r, XMATCH("Home team", h)) <> ""))
    ```
 
-   This copies only Season through Score sheet photo, plus the Timestamp, finding them by their
+   This copies only the season, week, teams, scores, photo and timestamp, finding them by their
    column names, and updates itself as responses arrive. If you ever rename a form question, change it here too.
 7. *Optional, if Richard wants to approve results before they go live:* type `Approved` in the first
    empty header cell of "Form Responses 1", insert checkboxes below it, and add `,"Approved"` after
@@ -298,7 +301,7 @@ API data to train its models. Its live API call hasn't been tested yet.
 | key | value |
 | --- | --- |
 | `notice` | Banner across every page; **clear it when the site goes live** |
-| `contact_email` | General league email shown in the footer and on Contact |
+| `contact_email` | General league email shown in the footer and on Contact. Captains' replies to the "here's what we read" emails go here too |
 | `score_sheet_form_url` | The form's link (Send → link icon). Adds "Submit a completed score sheet" buttons |
 | `photo_album_url` | Shared Google Photos album link |
 | `show_score_sheet_links` | `yes` to show "View" links to uploaded score sheets |
@@ -308,6 +311,7 @@ API data to train its models. Its live API call hasn't been tested yet.
 | `player_min_games` | Games needed to appear in the player leaders table (default 30) |
 | `site_url` | The website's address; used in the "New score sheet to read" emails |
 | `reader_email` | Who gets a "New score sheet to read" email for each submission (comma-separated for several) |
+| `captain_emails` | `no` stops the "here's what we read" emails to captains (they're on otherwise) |
 | `alert_email` | Where the optional automatic reader sends "needs a look" emails |
 
 ## 10. Test, then bring Richard in
@@ -316,7 +320,8 @@ Until now only Michael has access. Keep the preview banner (Settings → `notice
 improve the site for as long as needed.
 
 1. **End-to-end test:** submit a test score sheet, wait about 15 minutes, and check the division
-   page and `/data-check/`. Then delete the test row from "Form Responses 1" and click **Update
+   page and `/data-check/`. Once it's read, the submitter gets the "here's what we read" email
+   (within 15 minutes of the Reader status being set). Then delete the test row from "Form Responses 1" and click **Update
    website now**.
 2. **Show Richard the running site** along with the documents, and go through the questions in
    [PROJECT_PLAN.md](PROJECT_PLAN.md) ("Questions for Richard"). First make the Netlify site

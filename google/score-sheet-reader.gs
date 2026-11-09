@@ -101,15 +101,15 @@ function readScoreSheets() {
       season: findColumn_(header, 'Season'),
       week: findColumn_(header, 'Week'),
       home: findColumn_(header, 'Home team'),
-      away: findColumn_(header, 'Away team'),
+      away: findAnyColumn_(header, VISITING_TEAM),
       homeScore: findColumn_(header, 'Home team games won'),
-      awayScore: findColumn_(header, 'Away team games won'),
+      awayScore: findAnyColumn_(header, VISITING_SCORE),
       photo: findColumn_(header, 'Score sheet photo'),
       status: findColumn_(header, STATUS_HEADER),
       note: findColumn_(header, NOTE_HEADER),
     };
     if ([c.season, c.home, c.away, c.photo].some((i) => i < 0)) {
-      throw new Error('Form Responses 1 is missing a Season, Home team, Away team or Score sheet photo column.');
+      throw new Error('Form Responses 1 is missing a Season, Home team, Visiting team or Score sheet photo column.');
     }
 
     let done = 0;

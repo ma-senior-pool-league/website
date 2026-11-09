@@ -273,6 +273,18 @@ export function parseTimestamp(value: string): string {
   return `${date} ${pad(h)}:${m[2]}:${m[3] ?? '00'}`;
 }
 
+/**
+ * Of several matches (same teams, same home side), the one played most recently by `day`
+ * (YYYY-MM-DD, with a day's leeway for late-night submissions), or else the next one.
+ */
+function matchNear(matches: Match[], day: string): Match {
+  const next = new Date(`${day}T00:00:00Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  const limit = next.toISOString().slice(0, 10);
+  const byDate = [...matches].sort((a, b) => a.date.localeCompare(b.date));
+  return byDate.filter((m) => m.date <= limit).at(-1) ?? byDate[0];
+}
+
 const parseBool = (v: string) => /^(yes|y|true|x|1|✓|✔)$/i.test(v.trim());
 const parseCount = (v: string): number | null => (/^\d+$/.test(v.trim()) ? Number(v.trim()) : null);
 const isLink = (v: string) => /^https?:\/\/\S+$/i.test(v) || /^\/\S*$/.test(v);
@@ -552,15 +564,24 @@ export function getLeague(): League {
       pendingApproval++;
       continue;
     }
-    const season = lookup(seasonById, get(r, 'season'));
+    const at = parseTimestamp(get(r, 'timestamp'));
+    const sentOn = at.slice(0, 10);
+    // The form doesn't ask for the season or week: the Sheet's script fills them in. If it
+    // couldn't, use the latest season that had started by the day the sheet was sent in.
+    const seasonName = get(r, 'season');
+    const season = seasonName
+      ? lookup(seasonById, seasonName)
+      : sentOn
+        ? seasons.find((s) => s.startDate <= sentOn)
+        : undefined;
     const home = lookup(teamById, get(r, 'home'));
     const away = lookup(teamById, get(r, 'away'));
     const homeScore = parseCount(get(r, 'home_score'));
     const awayScore = parseCount(get(r, 'away_score'));
     const errs = [
-      !season && `season "${get(r, 'season')}" isn't on the Seasons tab`,
+      !season && (seasonName ? `season "${seasonName}" isn't on the Seasons tab` : 'the season is blank'),
       !home && `home team "${get(r, 'home')}" isn't on the Teams tab`,
-      !away && `away team "${get(r, 'away')}" isn't on the Teams tab`,
+      !away && `visiting team "${get(r, 'away')}" isn't on the Teams tab`,
       (homeScore === null || awayScore === null) &&
         `games won should be whole numbers (got "${get(r, 'home_score')}" and "${get(r, 'away_score')}")`,
       homeScore !== null && homeScore === awayScore && `the score is tied ${homeScore}–${awayScore}; include the tie-breaker games`,
@@ -570,12 +591,14 @@ export function getLeague(): League {
       continue;
     }
     // Find the scheduled match: by week if given, otherwise (or if the week is wrong) by the
-    // home/away pairing when that pairing happens only once in the season.
+    // home/away pairing: the only such match in the season, or the one nearest the day the
+    // sheet was sent in.
     const week = Number(get(r, 'week'));
     let match = Number.isInteger(week) ? matchByKey.get(matchKey(season!.id, week, home!.id, away!.id)) : undefined;
     if (!match) {
       const candidates = season!.matches.filter((m) => m.homeId === home!.id && m.awayId === away!.id);
       if (candidates.length === 1) match = candidates[0];
+      else if (candidates.length > 1 && sentOn) match = matchNear(candidates, sentOn);
     }
     if (!match) {
       report(
@@ -590,7 +613,6 @@ export function getLeague(): League {
     const urls = get(r, 'score_sheet')
       .split(/[\s,]+/)
       .filter((u) => isWebLink(u));
-    const at = parseTimestamp(get(r, 'timestamp'));
     const prev = resultFrom.get(match);
     if (match.homeScore !== null && prev) {
       if (match.homeScore === homeScore && match.awayScore === awayScore) {

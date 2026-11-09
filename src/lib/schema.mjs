@@ -31,8 +31,8 @@ export const TABLES = {
     aliases: { home_team: 'home', away_team: 'away' },
   },
   'results.csv': {
-    required: ['season', 'home', 'away', 'home_score', 'away_score'],
-    optional: ['week', 'approved', 'score_sheet', 'timestamp'],
+    required: ['home', 'away', 'home_score', 'away_score'],
+    optional: ['season', 'week', 'approved', 'score_sheet', 'timestamp'],
     optionalFile: true,
     aliases: {
       home_team: 'home',

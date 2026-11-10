@@ -9,7 +9,8 @@ for score sheets, Drive for uploads, Google Photos for the gallery).
 changeable from the Google Sheet. Never require a code edit for content, seasons, links or banners.
 Docs: [README.md](README.md), [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) (requirements, decisions,
 open questions), [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md),
-[docs/COMMISSIONER_GUIDE.md](docs/COMMISSIONER_GUIDE.md).
+[docs/COMMISSIONER_GUIDE.md](docs/COMMISSIONER_GUIDE.md), [docs/WEBMASTER_GUIDE.md](docs/WEBMASTER_GUIDE.md)
+(the webmaster role, i.e. Michael, and how to hand it over).
 
 ## Commands
 

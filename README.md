@@ -21,11 +21,13 @@ for.
 | [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) | Requirements, decisions, data issues, questions for Richard |
 | [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md) | One-time setup: league Google account, Sheet, Form, hosting, automatic updates |
 | [docs/COMMISSIONER_GUIDE.md](docs/COMMISSIONER_GUIDE.md) | Plain-language guide for the commissioner |
+| [docs/WEBMASTER_GUIDE.md](docs/WEBMASTER_GUIDE.md) | What the webmaster looks after, and how to hand that role (and score-sheet reading) to someone else |
 | [docs/SCORE_SHEET_AGENT.md](docs/SCORE_SHEET_AGENT.md) | Instructions for a volunteer's AI agent that reads score sheets (published at `/score-sheet-agent/`) |
 | [src/data/league/README.md](src/data/league/README.md) | Every tab and column |
 
 > **Status:** preview. Real locations, teams, rules and the Greater Boston Fall 2026 schedule and
-> results are loaded; other divisions are pending. Google setup not done yet.
+> results are loaded; other divisions are pending. The Google setup is done and the site is
+> running with a preview banner.
 
 ## Quick start
 

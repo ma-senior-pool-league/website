@@ -73,6 +73,12 @@ Chosen over a custom Cloudflare backend because no long-term technical maintaine
   documents together. A working site is easier to judge than a description, nothing costs money,
   and anything can still be changed.
 
+- **Named roles, each with a hand-over (Michael, Nov 2026):** commissioner, division
+  coordinators, captains, score-sheet reader, and **webmaster** (Michael first): the volunteer
+  who changes how the site looks or works and is a second way into the league's accounts. The
+  site runs without a webmaster; only code changes wait. Hand-over steps for the webmaster and
+  the score-sheet reader are in [WEBMASTER_GUIDE.md](WEBMASTER_GUIDE.md).
+
 Trade-offs accepted: captains without Google accounts depend on Richard or a coordinator; uploaded
 sheets are organized by a spreadsheet (and links on the division pages), not by Drive sub-folders;
 the site updates about 10–15 minutes after a change, not instantly.
@@ -84,7 +90,7 @@ the site updates about 10–15 minutes after a change, not instantly.
 | 1 | Blank score sheets | ✅ Forms page (Documents tab) | Final version incl. back page |
 | 2 | Rules: league + BCA, WPA, UPA | ✅ League rules (web + PDF); BCA/WPA/UPA links via Settings | Which BCA/WPA/UPA documents |
 | 3 | Referee tip sheet | 🟡 "Coming soon" on Forms page | PDF when finalized → Documents tab |
-| 4 | Playing locations with contacts | ✅ Locations page | Confirm Newton (see issues) |
+| 4 | Playing locations with contacts | ✅ Locations page | Newton Senior Center's phone number |
 | 5 | Division schedules | ✅ Per season / division; Greater Boston loaded | Other divisions → Schedule tab |
 | 6 | Submit and store score sheets, by season and division | 🟡 Built: Form → Drive + Results tab; optional "View" links on division pages | Google setup (GOOGLE_SETUP.md) |
 | 7 | Results and standings, by season and division | ✅ Season archive → division pages; live from the Results tab | Other divisions' results |
@@ -95,9 +101,10 @@ the site updates about 10–15 minutes after a change, not instantly.
 
 ## Data issues found in the documents (to confirm with Richard)
 
-1. **Newton's home location conflicts.** The Locations list (Oct 30, 2026) says *"Home games at
-   Waltham Senior Ctr"*. The Fall 2026 schedule says *"Newton Senior Center pool room is now open –
-   345 Walnut St (third floor)"*. **The site uses Waltham**, the newer document.
+1. **Newton's home location: resolved (Nov 2026).** The Locations list (Oct 30, 2026) said
+   *"Home games at Waltham Senior Ctr"*; the Fall 2026 schedule said *"Newton Senior Center pool
+   room is now open – 345 Walnut St (third floor)"*. Michael confirmed the pool room reopened, so
+   Newton's home is the Newton Senior Center, 345 Walnut Street. Its phone number isn't known yet.
 2. **Standings tie-break** is inferred from the Fall 2026 sheet: matches won, then games won.
 3. **The score-sheet draft is one page.** It says instructions and rules are "on back of page", but
    that page isn't in the PDF.
@@ -114,8 +121,7 @@ site.)*
 
 1. Could you send the Fall 2026 **schedules and results for Central Mass, Metro West and North
    East**? Do all divisions play Thursdays at 11:00 AM?
-2. **Newton:** are home games at the Waltham Senior Center, or back at the Newton (Cooper Center)
-   pool room at 345 Walnut St?
+2. **Newton Senior Center:** what phone number should the Locations page list for it?
 3. **Playoffs:** how does the playoff work with four division winners (who plays whom, rounds,
    dates, where)?
 4. **Standings tie-breaker:** when two teams have the same number of match wins, is the order
@@ -172,6 +178,6 @@ site.)*
   get in, so the site survives volunteer turnover. The code is the exception: GitHub allows one
   free personal account per person, so it lives in a free GitHub organization
   (`ma-senior-pool-league`) owned by Michael's own GitHub account. Add a second owner before he
-  steps away.
+  steps away ([WEBMASTER_GUIDE.md](WEBMASTER_GUIDE.md) has the full hand-over).
 - Accessibility for older users stays a hard requirement: large text, high contrast, big buttons,
   simple navigation.

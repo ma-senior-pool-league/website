@@ -201,7 +201,7 @@ with the link can see the album.
    it is secret: the Sheet links are public anyway, and the README's first lines send anyone who
    finds it to the website. Nobody needs GitHub day to day. Before Michael steps away, invite a
    successor's own GitHub account as a second owner (organization **People → Invite member →
-   Owner**).
+   Owner**). [WEBMASTER_GUIDE.md](WEBMASTER_GUIDE.md) has the full hand-over.
 2. Create a free **Cloudflare** account with the league email (https://dash.cloudflare.com/sign-up;
    skip adding a domain). **Workers & Pages → Create → Pages → Import an existing Git repository
    → Connect GitHub**. When GitHub asks, install *Cloudflare Workers and Pages* on the
@@ -353,4 +353,5 @@ coordinators and captains.
 ## What still needs a developer
 
 Changing the layout or design, adding new kinds of pages, or replacing the built-in rules text.
-That last one can be avoided with `rules_url`. Everything else is in the Sheet.
+That last one can be avoided with `rules_url`. Everything else is in the Sheet. These changes are
+the webmaster's job; see [WEBMASTER_GUIDE.md](WEBMASTER_GUIDE.md).

@@ -115,6 +115,9 @@ automatically, and `/data-check/` lists both rows so the old one can be deleted.
 2. Open **Data check**. It names the tab and row of any problem and what's wrong, for example a
    misspelled team name or a tied score.
 3. Fix it in the spreadsheet, then **League website → Update website now**.
+4. Still stuck, or want the site to look or work differently? Ask the **webmaster**, the volunteer
+   who looks after the site's code (Michael, to start). How that role, and score-sheet reading,
+   pass to someone new is in [WEBMASTER_GUIDE.md](WEBMASTER_GUIDE.md).
 
 Nothing you do in the spreadsheet can break the website. At worst, a row is skipped until it's
 fixed.

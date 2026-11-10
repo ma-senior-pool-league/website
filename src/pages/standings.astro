@@ -7,7 +7,7 @@ const league = getLeague();
 const season = league.currentSeason;
 ---
 
-<BaseLayout title="Standings" description={`${season.name} standings for every division.`}>
+<BaseLayout title="Standings" description={`${season.name} standings.`}>
   <h1>{season.name} standings <span class="pill">{seasonStatusLabel[season.status]}</span></h1>
   <p class="lede">
     Teams are ranked by matches won, then by total games won. Games include tie-breaker games.

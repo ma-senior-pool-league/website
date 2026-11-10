@@ -27,7 +27,9 @@ const allThursdays = matches.every((m) => new Date(`${m.date}T00:00:00Z`).getUTC
   title={`${division.name} · ${season.name}`}
   description={`${division.name} division schedule, results and standings for ${season.name}.`}
 >
-  <p><a href={`/seasons/${season.id}/`}>&larr; {season.name}: all divisions</a></p>
+  <p>
+    <a href={`/seasons/${season.id}/`}>&larr; {season.name}{season.divisionIds.length > 1 ? ': all divisions' : ''}</a>
+  </p>
   <h1>{division.name} <span class="pill">{season.name} · {seasonStatusLabel[season.status]}</span></h1>
   <p class="lede">
     {startTime && `Matches start at ${startTime}${allThursdays ? ', every Thursday,' : ''} `}

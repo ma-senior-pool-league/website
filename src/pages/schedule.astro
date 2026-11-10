@@ -8,11 +8,14 @@ const league = getLeague();
 const season = league.currentSeason;
 const today = todayISO();
 const upNext = nextMatches(season.matches, today);
+const several = league.divisions.length > 1;
 ---
 
-<BaseLayout title="Schedules" description={`${season.name} division schedules.`}>
-  <h1>{season.name} schedules</h1>
-  <p class="lede">Choose a division to see its full schedule and results.</p>
+<BaseLayout title={several ? 'Schedules' : 'Schedule'} description={`${season.name} schedule and results.`}>
+  <h1>{season.name} {several ? 'schedules' : 'schedule'}</h1>
+  <p class="lede">
+    {several ? 'Choose a division to see its full schedule and results.' : 'The full schedule and results, week by week.'}
+  </p>
 
   <div class="grid">
     {
@@ -50,7 +53,7 @@ const upNext = nextMatches(season.matches, today);
     upNext.length > 0 && (
       <section aria-labelledby="next-heading">
         <h2 id="next-heading">Next matches: {formatDate(upNext[0]!.date)}</h2>
-        <MatchTable matches={upNext} showDate={false} showDivision />
+        <MatchTable matches={upNext} showDate={false} showDivision={several} />
       </section>
     )
   }

@@ -63,7 +63,11 @@ const team = (r: (typeof rows)[number]) => teamById.get(r.player.teamId)?.name ?
                   <td class="num">{i + 1}</td>
                   <th scope="row">{name(r)}</th>
                   <td>
-                    <a href={`/teams/${r.player.teamId}/`}>{team(r)}</a>
+                    {teamById.get(r.player.teamId)?.onWebsite ? (
+                      <a href={`/teams/${r.player.teamId}/`}>{team(r)}</a>
+                    ) : (
+                      team(r)
+                    )}
                   </td>
                   <td class="num">
                     <strong>{r.wins}</strong>

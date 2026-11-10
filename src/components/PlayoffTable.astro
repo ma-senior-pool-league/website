@@ -7,7 +7,9 @@ interface Props {
 }
 
 const { matches } = Astro.props;
-const { teamById } = getLeague();
+const { teamById, divisionById, locations } = getLeague();
+// Locations listed on the Locations page (home locations of teams on the website).
+const listed = new Set(locations.map((l) => l.id));
 
 // Group by round, keeping the order rounds first appear in.
 const rounds = new Map<string, PlayoffMatch[]>();
@@ -40,17 +42,31 @@ for (const m of matches) rounds.set(m.round, [...(rounds.get(m.round) ?? []), m]
                     {m.time && <div class="meta">{formatTime(m.time)}</div>}
                   </td>
                   <td class="wrap">
-                    <a href={`/teams/${t1.id}/`} class:list={{ 'score-win': played && m.team1Score! > m.team2Score! }}>
-                      {t1.name}
-                    </a>{' '}
-                    vs{' '}
-                    <a href={`/teams/${t2.id}/`} class:list={{ 'score-win': played && m.team2Score! > m.team1Score! }}>
-                      {t2.name}
-                    </a>
+                    {[
+                      [t1, played && m.team1Score! > m.team2Score!] as const,
+                      [t2, played && m.team2Score! > m.team1Score!] as const,
+                    ].map(([t, won], i) => (
+                      <>
+                        {i > 0 && ' vs '}
+                        {t.onWebsite ? (
+                          <a href={`/teams/${t.id}/`} class:list={{ 'score-win': won }}>
+                            {t.name}
+                          </a>
+                        ) : (
+                          <span class:list={{ 'score-win': won }}>
+                            {t.name} ({divisionById.get(t.divisionId)!.name})
+                          </span>
+                        )}
+                      </>
+                    ))}
                     {m.note && <div class="meta">{m.note}</div>}
                   </td>
                   <td class="wrap">
-                    {m.locationId ? <a href={`/locations/#${m.locationId}`}>{m.location}</a> : m.location || '—'}
+                    {m.locationId && listed.has(m.locationId) ? (
+                      <a href={`/locations/#${m.locationId}`}>{m.location}</a>
+                    ) : (
+                      m.location || '—'
+                    )}
                   </td>
                   <td>{played ? `${m.team1Score}–${m.team2Score}` : <span class="pill">Upcoming</span>}</td>
                 </tr>

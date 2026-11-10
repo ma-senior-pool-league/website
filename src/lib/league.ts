@@ -32,6 +32,8 @@ export interface Division {
   id: string;
   name: string;
   order: number;
+  /** False when the Divisions tab says `no` under on_website: its rows stay in the Sheet, but the site leaves it out. */
+  onWebsite: boolean;
 }
 
 export interface Location {
@@ -51,6 +53,8 @@ export interface Team {
   locationId: string;
   captain: string;
   note: string;
+  /** Its division is on the website. Teams that aren't have no page and aren't linked. */
+  onWebsite: boolean;
 }
 
 export interface Match {
@@ -191,12 +195,20 @@ export interface Settings {
 }
 
 export interface League {
+  /** Divisions on the website, in order. */
   divisions: Division[];
+  /** Divisions switched off on the Divisions tab (on_website = no). */
+  divisionsOff: Division[];
+  /** Every division, including those switched off. */
   divisionById: Map<string, Division>;
+  /** Home locations of the teams on the website. */
   locations: Location[];
   locationById: Map<string, Location>;
+  /** Teams on the website. */
   teams: Team[];
+  /** Every team, including those in divisions switched off (check `onWebsite` before linking). */
   teamById: Map<string, Team>;
+  /** Players on teams on the website. */
   players: Player[];
   playerById: Map<string, Player>;
   /** Newest first. */
@@ -288,6 +300,7 @@ function matchNear(matches: Match[], day: string): Match {
 }
 
 const parseBool = (v: string) => /^(yes|y|true|x|1|✓|✔)$/i.test(v.trim());
+const parseNo = (v: string) => /^(no|n|false|0|off|✗|✘)$/i.test(v.trim());
 const parseCount = (v: string): number | null => (/^\d+$/.test(v.trim()) ? Number(v.trim()) : null);
 const isLink = (v: string) => /^https?:\/\/\S+$/i.test(v) || /^\/\S*$/.test(v);
 const isWebLink = (v: string) => /^https:\/\/\S+$/i.test(v);
@@ -422,13 +435,31 @@ export function getLeague(): League {
   const divisionById = new Map<string, Division>();
   for (const r of readTable('divisions.csv', problems)) {
     const order = Number(get(r, 'order') || 999);
+    // Blank means yes, so the column is optional and new divisions show up by default.
+    const onRaw = get(r, 'on_website');
+    const onWebsite = !parseNo(onRaw);
+    if (onRaw && !parseBool(onRaw) && !parseNo(onRaw)) {
+      report('divisions.csv', r.n, `on_website "${onRaw}" should be yes or no; showing the division.`);
+    }
     register(divisionById, 'divisions.csv', r, get(r, 'name'), (id) => ({
       id,
       name: get(r, 'name'),
       order: Number.isFinite(order) ? order : 999,
+      onWebsite,
     }));
   }
-  const divisions = [...divisionById.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+  const allDivisions = [...divisionById.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+  if (allDivisions.length && allDivisions.every((d) => !d.onWebsite)) {
+    problems.push({
+      file: 'divisions.csv',
+      message: 'Every division says "no" under on_website, so the website is showing them all. Put "yes" next to at least one.',
+    });
+    for (const d of allDivisions) d.onWebsite = true;
+  }
+  // Divisions switched off keep all their rows in the Sheet. Everything below still reads and
+  // checks them (so switching one back on needs nothing else); only what the pages see is trimmed.
+  const divisions = allDivisions.filter((d) => d.onWebsite);
+  const divisionsOff = allDivisions.filter((d) => !d.onWebsite);
 
   // ---- locations ----------------------------------------------------------
   const locationById = new Map<string, Location>();
@@ -465,9 +496,11 @@ export function getLeague(): League {
       locationId: location?.id ?? '',
       captain: get(r, 'captain'),
       note: get(r, 'note'),
+      onWebsite: division.onWebsite,
     }));
   }
-  const teams = [...teamById.values()];
+  const teams = [...teamById.values()].filter((t) => t.onWebsite);
+  const teamOnWebsite = (id: string) => teamById.get(id)?.onWebsite ?? false;
 
   // ---- seasons ------------------------------------------------------------
   const seasonById = new Map<string, Season>();
@@ -926,6 +959,14 @@ export function getLeague(): League {
     });
   }
 
+  // ---- leave out divisions switched off -------------------------------------
+  // Their matches were still read above, so results and score sheets matched as usual.
+  // A playoff stays if either team is on the website (the other is named, not linked).
+  for (const season of seasons) {
+    season.matches = season.matches.filter((m) => divisionById.get(m.divisionId)!.onWebsite);
+    season.playoffs = season.playoffs.filter((p) => teamOnWebsite(p.team1Id) || teamOnWebsite(p.team2Id));
+  }
+
   // ---- standings per season + division ------------------------------------
   for (const season of seasons) {
     season.matches.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time) || a.week - b.week);
@@ -955,26 +996,39 @@ export function getLeague(): League {
     );
   }
 
+  const homeLocationIds = new Set(teams.map((t) => t.locationId));
   cache = {
     divisions,
+    divisionsOff,
     divisionById,
-    locations,
+    locations: locations.filter((l) => homeLocationIds.has(l.id)),
     locationById,
     teams,
     teamById,
-    players: [...playerById.values()],
+    players: [...playerById.values()].filter((p) => teamOnWebsite(p.teamId)),
     playerById,
     seasons,
     seasonById,
     currentSeason: current!,
     news,
     documents,
-    contacts,
+    contacts: contacts.filter((c) => !c.divisionId || divisionById.get(c.divisionId)!.onWebsite),
     settings,
     problems,
     pendingApproval,
   };
   return cache;
+}
+
+/**
+ * What the website covers when some divisions are switched off: "Greater Boston division",
+ * "Greater Boston and Metro West divisions". '' when every division is on the website.
+ */
+export function coverageLabel(league: League): string {
+  if (!league.divisionsOff.length) return '';
+  const names = league.divisions.map((d) => d.name);
+  const list = names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names.at(-1)}` : names[0];
+  return `${list} division${names.length > 1 ? 's' : ''}`;
 }
 
 export function isPlayed(m: Match): boolean {

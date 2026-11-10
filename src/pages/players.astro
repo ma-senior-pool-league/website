@@ -7,9 +7,11 @@ const season = league.currentSeason;
 const { settings } = league;
 ---
 
-<BaseLayout title="Player stats" description={`${season.name} player standings by division.`}>
+<BaseLayout title="Player stats" description={`${season.name} player standings.`}>
   <h1>{season.name} player stats</h1>
-  <p class="lede">Individual wins and losses from every score sheet, by division.</p>
+  <p class="lede">
+    Individual wins and losses from every score sheet{league.divisions.length > 1 ? ', by division' : ''}.
+  </p>
 
   <div class="grid">
     {

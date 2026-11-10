@@ -5,9 +5,13 @@ import { getLeague } from '../../lib/league';
 const league = getLeague();
 ---
 
-<BaseLayout title="Teams" description="All teams in the league, by division.">
+<BaseLayout title="Teams" description="Teams and their home locations.">
   <h1>Teams</h1>
-  <p class="lede">{league.teams.length} teams in {league.divisions.length} divisions, with their home locations.</p>
+  <p class="lede">
+    {league.teams.length} teams in{' '}
+    {league.divisions.length > 1 ? `${league.divisions.length} divisions` : `the ${league.divisions[0]?.name} division`},
+    with their home locations.
+  </p>
 
   {
     league.divisions.map((division) => (

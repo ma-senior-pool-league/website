@@ -8,7 +8,7 @@ import { getLeague, isPlayed, readSyncStatus } from '../lib/league';
 import { formatDate } from '../lib/format';
 import { site } from '../site.config';
 
-const { problems, pendingApproval, currentSeason, teamById, divisionById } = getLeague();
+const { problems, pendingApproval, currentSeason, teamById, divisionById, divisionsOff } = getLeague();
 
 // Played matches whose score sheet hasn't been read into the Games tab yet.
 const waiting = currentSeason.matches.filter((m) => isPlayed(m) && m.games.length === 0);
@@ -41,6 +41,15 @@ const syncFailures = sync ? Object.entries(sync.files).filter(([, s]) => s.start
       <strong>Google Sheet last read:</strong>
       {syncedAt || 'Not connected to the Google Sheet yet (using the copy saved with the website).'}
     </li>
+    {
+      divisionsOff.length > 0 && (
+        <li>
+          <strong>Not on the website:</strong> {divisionsOff.map((d) => d.name).join(', ')}. Their rows stay in the
+          Google Sheet. To show a division again, put <code>yes</code> next to it under <strong>on_website</strong> on
+          the Divisions tab.
+        </li>
+      )
+    }
     {
       pendingApproval > 0 && (
         <li>

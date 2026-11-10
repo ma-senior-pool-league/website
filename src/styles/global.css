@@ -147,6 +147,10 @@ h3 {
   font-weight: 800;
   font-size: 1.15rem;
 }
+.brand-division {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
 .brand-season {
   font-size: 0.85rem;
   opacity: 0.85;

@@ -11,7 +11,9 @@
  *     sheet, so a volunteer's AI agent (or the volunteer) can read it into the Games tab.
  *     See docs/SCORE_SHEET_AGENT.md, also published on the website at /score-sheet-agent/;
  *   - once it's read, emails the captain who sent it what was read, so they can check it
- *     (Settings > captain_emails = no turns this off).
+ *     (Settings > captain_emails = no turns this off);
+ *   - keeps the form's Home team and Visiting team lists matched to the teams on the website:
+ *     the Teams tab, minus divisions switched off on the Divisions tab (on_website = no).
  *
  * score-sheet-reader.gs is optional: a fully automatic reader that needs a paid Anthropic
  * API key. Without it (or without the key) everything here still works.
@@ -38,12 +40,17 @@ const SHEETS = {
   players: 'Players',
   settings: 'Settings',
   schedule: 'Schedule',
+  teams: 'Teams',
+  divisions: 'Divisions',
 };
 const STATUS_HEADER = 'Reader status';
 const NOTE_HEADER = 'Reader note';
 const EMAILED_HEADER = 'Captain emailed';
 // Form question titles for the visiting team; they used to say "Away team".
+const HOME_TEAM = ['Home team'];
 const VISITING_TEAM = ['Visiting team', 'Away team'];
+// Divisions tab column that switches a division off the website (and out of the form).
+const ON_WEBSITE = ['on_website', 'show', 'show_on_website', 'on_site', 'website'];
 const VISITING_SCORE = ['Visiting team games won', 'Away team games won'];
 
 /** Adds the "League website" menu when the Sheet is opened. */
@@ -54,6 +61,11 @@ function onOpen() {
 /** Menu item. */
 function updateWebsiteNow() {
   const ui = SpreadsheetApp.getUi();
+  try {
+    updateFormTeams_();
+  } catch (err) {
+    console.error(`Couldn't update the form's team lists: ${err}`);
+  }
   if (!getHookUrl_()) {
     ui.alert('The website link (DEPLOY_HOOK_URL) has not been set up yet. Ask the site administrator.');
     return;
@@ -79,12 +91,14 @@ function setUp() {
 
   const responses = ss.getSheetByName(SHEETS.responses);
   if (responses) ensureColumns_(responses, ['Season', 'Week', STATUS_HEADER, NOTE_HEADER, EMAILED_HEADER]);
+  const formChanged = updateFormTeams_();
 
   Logger.log(
     `Triggers installed. Deploy hook: ${getHookUrl_() ? 'yes' : 'NO, add DEPLOY_HOOK_URL'}. ` +
       `Reader emails go to: ${setting_(ss, 'reader_email') || '(nobody yet; set reader_email in Settings)'}. ` +
       `Captain emails: ${captainEmailsOn_(ss) ? 'on' : 'off'}. ` +
-      `Automatic (paid) reader: ${automatic ? 'on' : 'off'}.`,
+      `Automatic (paid) reader: ${automatic ? 'on' : 'off'}. ` +
+      `Form team lists: ${websiteTeams_(ss).join(', ')}${formChanged ? ' (updated)' : ''}.`,
   );
 }
 
@@ -159,7 +173,70 @@ function watchForChanges() {
   const props = PropertiesService.getScriptProperties();
   if (props.getProperty(DIGEST_PROPERTY) === digest) return;
   props.setProperty(DIGEST_PROPERTY, digest);
+  try {
+    updateFormTeams_();
+  } catch (err) {
+    console.error(`Couldn't update the form's team lists: ${err}`);
+  }
   scheduleRebuild_();
+}
+
+/**
+ * Sets the form's Home team and Visiting team dropdowns to the teams on the website
+ * (websiteTeams_). Only touches the form when a list differs. Returns true if it changed.
+ */
+function updateFormTeams_() {
+  const ss = SpreadsheetApp.getActive();
+  const formUrl = ss.getFormUrl();
+  if (!formUrl) return false;
+  const names = websiteTeams_(ss);
+  if (!names.length) return false; // never empty the dropdowns
+  const wanted = [...HOME_TEAM, ...VISITING_TEAM].map(normalize_);
+  let changed = false;
+  FormApp.openByUrl(formUrl)
+    .getItems(FormApp.ItemType.LIST)
+    .filter((item) => wanted.includes(normalize_(item.getTitle())))
+    .forEach((item) => {
+      const list = item.asListItem();
+      const now = list.getChoices().map((c) => c.getValue());
+      if (now.join('\n') === names.join('\n')) return;
+      list.setChoiceValues(names);
+      changed = true;
+    });
+  if (changed) console.log(`Form team lists set to: ${names.join(', ')}`);
+  return changed;
+}
+
+/**
+ * Team names on the Teams tab, alphabetical, leaving out divisions switched off on the
+ * Divisions tab (on_website = no). Same rule as the website: blank means yes, and if every
+ * division is switched off, all teams count.
+ */
+function websiteTeams_(ss) {
+  const off = new Set();
+  const divisions = ss.getSheetByName(SHEETS.divisions);
+  if (divisions && divisions.getLastRow() > 1) {
+    const data = divisions.getDataRange().getDisplayValues();
+    const name = findColumn_(data[0], 'name');
+    const on = findAnyColumn_(data[0], ON_WEBSITE);
+    if (name >= 0 && on >= 0) {
+      data.slice(1).forEach((r) => {
+        if (/^(no|n|false|0|off|✗|✘)$/i.test(String(r[on]).trim())) off.add(normalize_(r[name]));
+      });
+    }
+  }
+  const teams = ss.getSheetByName(SHEETS.teams);
+  if (!teams || teams.getLastRow() < 2) return [];
+  const data = teams.getDataRange().getDisplayValues();
+  const name = findColumn_(data[0], 'name');
+  const division = findColumn_(data[0], 'division');
+  if (name < 0) return [];
+  const rows = data.slice(1).filter((r) => String(r[name]).trim());
+  const pick = (skipOff) =>
+    rows.filter((r) => !skipOff || division < 0 || !off.has(normalize_(r[division]))).map((r) => String(r[name]).trim());
+  let names = pick(true);
+  if (!names.length) names = pick(false);
+  return [...new Set(names)].sort((a, b) => a.localeCompare(b));
 }
 
 /** Trigger target: asks the host to rebuild, and clears any pending one-off trigger. */

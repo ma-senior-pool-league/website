@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { site } from '../site.config';
-import { getLeague } from '../lib/league';
+import { coverageLabel, getLeague } from '../lib/league';
 
 interface Props {
   title?: string;
@@ -14,8 +14,12 @@ const pathname = Astro.url.pathname;
 const isCurrent = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 const league = getLeague();
 const seasonName = league.currentSeason.name;
+const coverage = coverageLabel(league);
 const { settings } = league;
-const nav = site.nav.filter((item) => !item.requires || settings[item.requires]);
+const nav = site.nav
+  .filter((item) => !item.requires || settings[item.requires])
+  // One division on the website: one schedule.
+  .map((item) => (item.href === '/schedule/' && league.divisions.length === 1 ? { ...item, label: 'Schedule' } : item));
 ---
 
 <!doctype html>
@@ -45,6 +49,7 @@ const nav = site.nav.filter((item) => !item.requires || settings[item.requires])
           <span class="brand-ball" aria-hidden="true">8</span>
           <span class="brand-text">
             <span class="brand-name">{site.name}</span>
+            {coverage && <span class="brand-division">{coverage}</span>}
             <span class="brand-season">{seasonName} season</span>
           </span>
         </a>

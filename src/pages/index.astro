@@ -2,13 +2,15 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SeasonStandings from '../components/SeasonStandings.astro';
 import MatchTable from '../components/MatchTable.astro';
-import { getLeague, nextMatches, seasonStatusLabel } from '../lib/league';
+import { coverageLabel, getLeague, nextMatches, seasonStatusLabel } from '../lib/league';
 import { formatDate, todayISO } from '../lib/format';
 import { site } from '../site.config';
 
 const league = getLeague();
 const season = league.currentSeason;
 const { settings } = league;
+const coverage = coverageLabel(league);
+const several = league.divisions.length > 1;
 const upNext = nextMatches(season.matches, todayISO());
 const news = league.news.slice(0, 3);
 ---
@@ -17,9 +19,10 @@ const news = league.news.slice(0, 3);
   <section class="hero">
     <h1>{site.name}</h1>
     <p>{site.tagline}</p>
+    {coverage && <p>This website covers the {coverage}.</p>}
     <div class="button-row">
       <a class="button" href="/standings/">Standings</a>
-      <a class="button secondary" href="/schedule/">Schedules</a>
+      <a class="button secondary" href="/schedule/">{several ? 'Schedules' : 'Schedule'}</a>
     </div>
   </section>
 
@@ -38,7 +41,7 @@ const news = league.news.slice(0, 3);
       <li><a href="/forms/">Blank score sheet &amp; forms</a></li>
       <li><a href="/rules/">League rules</a></li>
       <li><a href="/locations/">Playing locations</a></li>
-      <li><a href="/schedule/">Division schedules</a></li>
+      <li><a href="/schedule/">{several ? 'Division schedules' : 'Schedule & results'}</a></li>
       <li><a href="/players/">Player stats</a></li>
       <li><a href="/playoffs/">Playoffs</a></li>
     </ul>
@@ -48,7 +51,7 @@ const news = league.news.slice(0, 3);
     upNext.length > 0 && (
       <section aria-labelledby="next-heading">
         <h2 id="next-heading">Next matches: {formatDate(upNext[0]!.date)}</h2>
-        <MatchTable matches={upNext} showDate={false} showDivision />
+        <MatchTable matches={upNext} showDate={false} showDivision={several} />
       </section>
     )
   }

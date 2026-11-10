@@ -11,7 +11,12 @@
 
 /** @type {Record<string, TableDef>} */
 export const TABLES = {
-  'divisions.csv': { required: ['name'], optional: ['order', 'id'], optionalFile: false },
+  'divisions.csv': {
+    required: ['name'],
+    optional: ['order', 'on_website', 'id'],
+    optionalFile: false,
+    aliases: { show: 'on_website', show_on_website: 'on_website', on_site: 'on_website', website: 'on_website' },
+  },
   'locations.csv': { required: ['name', 'address', 'city'], optional: ['phone', 'map_url', 'id'], optionalFile: false },
   'teams.csv': {
     required: ['name', 'division', 'home_location'],

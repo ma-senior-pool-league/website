@@ -38,7 +38,7 @@ const syncFailures = sync ? Object.entries(sync.files).filter(([, s]) => s.start
   <ul class="card-list card">
     <li><strong>Website last updated:</strong> {builtAt}</li>
     <li>
-      <strong>Google Sheet last read:</strong>
+      <strong>Google Sheet last read:</strong>{' '}
       {syncedAt || 'Not connected to the Google Sheet yet (using the copy saved with the website).'}
     </li>
     {

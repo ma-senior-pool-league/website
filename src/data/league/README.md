@@ -18,7 +18,7 @@ July 2024 rules, and the Greater Boston Fall 2026 schedule and final results.
 | --- | --- | --- |
 | Settings (`settings.csv`) | **key**, **value** | Keys: `notice`, `contact_email`, `score_sheet_form_url`, `photo_album_url`, `show_score_sheet_links`, `rules_url`, `bca_rules_url`, `wpa_rules_url`, `upa_rules_url`, `player_names`, `player_min_games`, `site_url`, `reader_email`, `alert_email` |
 | Seasons (`seasons.csv`) | **name**, **start_date**, **status**, end_date, current | status: Upcoming / In progress / Final. Put `yes` under current on exactly one season |
-| Divisions (`divisions.csv`) | **name**, order | order = display order |
+| Divisions (`divisions.csv`) | **name**, order, on_website | order = display order. `no` under on_website leaves the division (its teams, schedules, results, players, locations and contacts) off the website and out of the score-sheet form's team lists, without deleting anything; blank means yes |
 | Locations (`locations.csv`) | **name**, **address**, **city**, phone, map_url | State is assumed MA; map link generated if blank |
 | Teams (`teams.csv`) | **name**, **division**, **home_location**, captain, note | note shows on the team page |
 | Players (`players.csv`) | **team**, **name**, also_known_as | Rosters. First names are matched automatically when unique on the team; list nicknames (e.g. "PC") under also_known_as |

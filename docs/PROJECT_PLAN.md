@@ -79,6 +79,14 @@ Chosen over a custom Cloudflare backend because no long-term technical maintaine
   site runs without a webmaster; only code changes wait. Hand-over steps for the webmaster and
   the score-sheet reader are in [WEBMASTER_GUIDE.md](WEBMASTER_GUIDE.md).
 
+- **Greater Boston only, for now (Richard and Michael, Nov 10 2026):** the other division
+  coordinators use different score sheets and may be reluctant to take this up, so the site
+  covers Greater Boston alone. If it works well there, it's the case for the others to join. The
+  Divisions tab's `on_website` column switches the other three off without deleting anything; the
+  website and the form's team lists follow it, so bringing a division back is a change to one
+  cell. Checkpoints from before the switch: Git tag `all-divisions-2026-11`, and a named version
+  in the Sheet's version history.
+
 Trade-offs accepted: captains without Google accounts depend on Richard or a coordinator; uploaded
 sheets are organized by a spreadsheet (and links on the division pages), not by Drive sub-folders;
 the site updates about 10–15 minutes after a change, not instantly.
@@ -91,9 +99,9 @@ the site updates about 10–15 minutes after a change, not instantly.
 | 2 | Rules: league + BCA, WPA, UPA | ✅ League rules (web + PDF); BCA/WPA/UPA links via Settings | Which BCA/WPA/UPA documents |
 | 3 | Referee tip sheet | 🟡 "Coming soon" on Forms page | PDF when finalized → Documents tab |
 | 4 | Playing locations with contacts | ✅ Locations page | Newton Senior Center's phone number |
-| 5 | Division schedules | ✅ Per season / division; Greater Boston loaded | Other divisions → Schedule tab |
+| 5 | Division schedules | ✅ Per season / division; Greater Boston only for now | Other divisions are switched off (see decisions) |
 | 6 | Submit and store score sheets, by season and division | 🟡 Built: Form → Drive + Results tab; optional "View" links on division pages | Google setup (GOOGLE_SETUP.md) |
-| 7 | Results and standings, by season and division | ✅ Season archive → division pages; live from the Results tab | Other divisions' results |
+| 7 | Results and standings, by season and division | ✅ Season archive → division pages; live from the Results tab | — (Greater Boston only for now) |
 | 8 | Photo gallery | 🟡 Photos page links a shared album | Create the album (setup step 5) |
 | 9 | Playoff schedules and results | ✅ Playoffs tab → Playoffs page and season pages | Playoff format and dates |
 | – | Log-in access for specific users | 🟡 Google accounts + sharing | Setup step 10 |
@@ -119,34 +127,32 @@ the site updates about 10–15 minutes after a change, not instantly.
 *(Plain language, ready to paste into a reply. To go through when Richard first sees the running
 site.)*
 
-1. Could you send the Fall 2026 **schedules and results for Central Mass, Metro West and North
-   East**? Do all divisions play Thursdays at 11:00 AM?
-2. **Newton Senior Center:** what phone number should the Locations page list for it?
-3. **Playoffs:** how does the playoff work with four division winners (who plays whom, rounds,
+1. **Newton Senior Center:** what phone number should the Locations page list for it?
+2. **Playoffs:** how does the playoff work with four division winners (who plays whom, rounds,
    dates, where)?
-4. **Standings tie-breaker:** when two teams have the same number of match wins, is the order
+3. **Standings tie-breaker:** when two teams have the same number of match wins, is the order
    decided by total games won?
-5. **BCA, WPA, UPA rules:** which documents or sections should we link to?
-6. **Score sheet:** is there a final version, including the back page with instructions?
-7. **Score sheets:** should the home captain send in the score sheet? Should results go live as soon
+4. **BCA, WPA, UPA rules:** which documents or sections should we link to?
+5. **Score sheet:** is there a final version, including the back page with instructions?
+6. **Score sheets:** should the home captain send in the score sheet? Should results go live as soon
    as they're submitted, or after you (or a coordinator) approve them?
-8. **Who should see completed score sheets?** Our suggestion: you and the four coordinators.
-9. **Photos:** who may add photos, and do we need players' consent to post them?
-10. **Contacts to publish:** how you'd like to be listed, and the four Division Coordinators' names
-    and emails. What's OK to be public?
-11. **Web address and accounts:** the site uses the host's free address (e.g.
+7. **Who should see completed score sheets?** Our suggestion: you and the Greater Boston coordinator.
+8. **Photos:** who may add photos, and do we need players' consent to post them?
+9. **Contacts to publish:** how you'd like to be listed, and the Greater Boston coordinator's name
+   and email. What's OK to be public?
+10. **Web address and accounts:** the site uses the host's free address (e.g.
     ma-senior-pool-league.pages.dev), so there's nothing to renew. It can still be renamed before
     it's announced: any preferred name? A league Google account owns everything, and you and
     Michael can both sign in to it (day to day you'd each use your own account). Should anyone else
     have access?
-12. **Past seasons:** do you have earlier results and standings you'd like archived on the site?
-13. **Rosters:** could you send each team's roster for all four divisions (the one you use for the
-    player stats)?
-14. **Player stats spreadsheet:** could you send the Fall 2026 player stats spreadsheet (the Excel
+11. **Past seasons:** do you have earlier results and standings you'd like archived on the site?
+12. **Rosters:** could you send each Greater Boston team's roster (the one you use for the player
+    stats)?
+13. **Player stats spreadsheet:** could you send the Fall 2026 player stats spreadsheet (the Excel
     file behind the PDF)? It would let the site show this season's full player history.
-15. **Player names online:** OK to show players as "first name + last initial" (e.g. Michael R.)
+14. **Player names online:** OK to show players as "first name + last initial" (e.g. Michael R.)
     on the public site, or full names as in your emails?
-16. **Substitutes:** when a player subs for another team, which team should their games count
+15. **Substitutes:** when a player subs for another team, which team should their games count
     under?
 
 ## Roadmap
@@ -157,11 +163,14 @@ site.)*
   form, photo album, hosting with automatic rebuilds, all with only Michael's access. Follow
   [GOOGLE_SETUP.md](GOOGLE_SETUP.md) steps 1–9, then test with practice score sheets and improve
   the running site until Michael is happy with it.
-- **Phase 3: Show Richard.** Walk him through the running site and the documents, including
-  [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md), go through the questions above, and give him
-  access (setup step 10).
-- **Phase 4: Go live.** Other divisions' data and rosters, the answers to the questions, clear the
-  preview banner, tell the coordinators and captains, first live week with real submissions.
+- **Phase 3: Show Richard (done, Nov 10 2026).** Outcome: start with Greater Boston only (see
+  decisions). Still to do: the questions above, and his access (setup step 10).
+- **Phase 4: Go live for Greater Boston.** Rosters, the answers to the questions, clear the preview
+  banner, tell the Greater Boston captains, first live week with real submissions.
+- **Phase 5 (if it goes well, ~6 months on): other divisions.** Show the other coordinators how
+  Greater Boston uses it. Switch each division that joins back on (Divisions tab `on_website`), and
+  load its schedule and rosters. If they keep their own score sheets, the form and the reading
+  instructions would need to handle them.
 - **Later / optional:** sort uploaded score sheets into season/division Drive folders automatically
   (small Apps Script); past-season archive; printable schedule pages.
 

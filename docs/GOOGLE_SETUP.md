@@ -100,8 +100,8 @@ teams, rules documents and Greater Boston Fall 2026 data.
 
    | # | Question title | Type | Notes |
    | --- | --- | --- | --- |
-   | 1 | Home team | Dropdown | All team names, exactly as on the Teams tab |
-   | 2 | Visiting team | Dropdown | Same list |
+   | 1 | Home team | Dropdown | Any one team for now: the Apps Script (step 7) fills in the teams on the website |
+   | 2 | Visiting team | Dropdown | Same |
    | 3 | Home team games won | Short answer | Response validation: Number, ≥ 0. Include tie-breaker games |
    | 4 | Visiting team games won | Short answer | Same |
    | 5 | Score sheet photo | File upload | **Required.** Allow images and PDF; max 5 files; 10 MB |
@@ -245,6 +245,11 @@ The site now rebuilds about 6 minutes after each form submission (after the last
 come in close together), within about 20 minutes of any change to the spreadsheet (a check runs
 every 15 minutes), every morning at 5 AM, and when anyone uses the menu. It also emails the score-sheet reader about each new submission (step 8). Google takes a few minutes to refresh published tabs, hence the delay.
 
+It also keeps the form's **Home team** and **Visiting team** lists matched to the teams on the
+website (the Teams tab, minus any division with `no` under `on_website` on the Divisions tab),
+when setUp runs, when anyone uses the menu, and within 15 minutes of a change to any tab. That
+needs permission to edit the form, which Google asks for when setUp runs.
+
 ## 8. Reading score sheets (for player stats)
 
 Player stats come from the **Games** tab: one row per game, saying who played and who won. Someone
@@ -346,9 +351,15 @@ improve the site for as long as needed.
 5. Give him [COMMISSIONER_GUIDE.md](COMMISSIONER_GUIDE.md) and have him bookmark the League Data
    sheet and `/data-check/`.
 
-**Going live:** load the remaining divisions and rosters, clear the banner, set
-`hide_from_search` to `no`, and tell the
-coordinators and captains.
+**Going live:** load the rosters, clear the banner, set `hide_from_search` to `no`, and tell
+the coordinators and captains.
+
+**Greater Boston only, for now (Nov 2026).** The other divisions' coordinators use different
+score sheets, so the site starts with Greater Boston alone. The Divisions tab's `on_website`
+column says `no` for the other three. Their rows stay in the Sheet, and changing `no` to `yes`
+brings a division back: on the website and in the form's team lists. The site as it was with
+all four divisions is tagged `all-divisions-2026-11` in GitHub, and the Sheet has a named version
+from before the switch (File → Version history).
 
 ## What still needs a developer
 

@@ -17,7 +17,7 @@ the website directly.
 | --- | --- | --- |
 | Settings | Banner message, contact email, links to the form, photo album and rule books | Rarely |
 | Seasons | One row per season, and which one is current | Twice a year |
-| Divisions | The four divisions | Rarely |
+| Divisions | The four divisions, and which ones are on the website (`on_website`) | Rarely |
 | Locations | Playing locations and phone numbers | When something changes |
 | Teams | Team name, division, home location | Each season |
 | Players | Each team's roster: team, full name, and any nickname | Each season, and when someone joins |
@@ -85,8 +85,9 @@ automatically, and `/data-check/` lists both rows so the old one can be deleted.
    **also_known_as** only if people write something other than the first name (for example "PC").
 4. **Schedule tab:** one row per match: season, week, date, time, division, home team, away team.
    You can copy last season's rows and change them.
-5. **Form:** update the team lists in the score-sheet form's two dropdowns. The Schedule tab
-   must be filled in before the first match, since the season and week come from it.
+5. **Form:** nothing to do. The score-sheet form's two team lists follow the Teams tab by
+   themselves (within about 15 minutes). The Schedule tab must be filled in before the first
+   match, since the season and week come from it.
 6. Choose **League website → Update website now**, wait 15 minutes, then open **Data check**.
 
 ## Other updates
@@ -108,6 +109,17 @@ automatically, and `/data-check/` lists both rows so the old one can be deleted.
   paste the link into Settings → `rules_url`. Add the PDF to the Documents tab too.
 - **Photos:** people add them to the shared Google Photos album. The link is in Settings →
   `photo_album_url`.
+
+## Which divisions are on the website
+
+For now the website covers only the **Greater Boston** division. The other three divisions are
+still in the spreadsheet, with all their teams, locations and any schedules. They're just
+switched off.
+
+On the **Divisions** tab, the **on_website** column says `yes` or `no` for each division. To
+bring a division back, change its `no` to `yes`. Within about 20 minutes, the website shows its
+teams, schedule, standings and locations, and the score-sheet form lists its teams again. To
+take one off, change `yes` to `no`. Nothing is deleted either way.
 
 ## If something looks wrong
 

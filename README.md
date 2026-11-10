@@ -25,9 +25,10 @@ for.
 | [docs/SCORE_SHEET_AGENT.md](docs/SCORE_SHEET_AGENT.md) | Instructions for a volunteer's AI agent that reads score sheets (published at `/score-sheet-agent/`) |
 | [src/data/league/README.md](src/data/league/README.md) | Every tab and column |
 
-> **Status:** preview. Real locations, teams, rules and the Greater Boston Fall 2026 schedule and
-> results are loaded; other divisions are pending. The Google setup is done and the site is
-> running with a preview banner.
+> **Status:** preview, for the **Greater Boston division only** (Nov 2026). The other three
+> divisions stay in the Google Sheet, switched off on its Divisions tab (`on_website` = `no`), and
+> can be switched back on without code changes. The code from before the switch is tagged
+> `all-divisions-2026-11`. The Google setup is done and the site is running with a preview banner.
 
 ## Quick start
 

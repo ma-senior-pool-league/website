@@ -36,6 +36,14 @@ open questions), [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md),
   When two different results conflict, the later `timestamp` wins, not the later row: Google Forms
   inserts each response under the header, above any pasted-in rows (which have no timestamp).
 - Each schedule row carries its `division`, so past seasons keep their grouping even if a team moves.
+- **Greater Boston only for now (Nov 2026):** the Divisions tab's optional `on_website` column
+  (blank = yes) switches divisions off without deleting rows. `getLeague()` reads and checks
+  everything, then trims what pages see: `divisions`, `teams`, `players`, `locations`, `contacts`
+  and each season's matches/playoffs cover only divisions that are on, while `teamById` and
+  `divisionById` keep everything (check `team.onWebsite` before linking to a team page). Pages
+  must read sensibly with one division (`coverageLabel()`, no Division column). The Apps Script
+  fills the form's team dropdowns with the same rule (`websiteTeams_`). Pre-switch code: tag
+  `all-divisions-2026-11`.
 - Standings: matches won, then games won, then name. Scores include tie-breaker games, so ties are
   reported as problems.
 - `google/apps-script.gs` runs in the Sheet and POSTs the host's deploy hook (after form submits,
